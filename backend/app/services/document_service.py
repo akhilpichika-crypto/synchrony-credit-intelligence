@@ -1,5 +1,8 @@
 import io
 from pypdf import PdfReader
+from backend.app.database import SessionLocal
+from backend.app.models.document_chunk import DocumentChunk
+from backend.app.services.embedding_service import chunk_text, generate_embedding
 
 
 def extract_pdf_text(file_bytes: bytes):
@@ -43,3 +46,80 @@ def extract_pdf_text(file_bytes: bytes):
         "page_count": len(reader.pages),
         "character_count": len(full_text)
     }
+
+def index_document(document_name: str, text: str):
+    """
+    Split document text into chunks, generate embeddings,
+    and store them in PostgreSQL with pgvector.
+    """
+
+    chunks = chunk_text(text)
+
+    if not chunks:
+        raise ValueError("No text chunks could be generated")
+
+    db = SessionLocal()
+
+    try:
+        # Prevent duplicate chunks if the same document is uploaded again
+        db.query(DocumentChunk).filter(
+            DocumentChunk.document_name == document_name
+        ).delete()
+
+        for index, chunk in enumerate(chunks):
+            embedding = generate_embedding(chunk)
+
+            document_chunk = DocumentChunk(
+                document_name=document_name,
+                chunk_index=index,
+                content=chunk,
+                embedding=embedding
+            )
+
+            db.add(document_chunk)
+
+        db.commit()
+
+        return {
+            "document_name": document_name,
+            "chunks_stored": len(chunks)
+        }
+
+    except Exception:
+        db.rollback()
+        raise
+
+    finally:
+        db.close()
+
+def retrieve_relevant_chunks(query: str, top_k: int = 3):
+    """
+    Retrieve the document chunks most semantically similar
+    to the user's query.
+    """
+
+    query_embedding = generate_embedding(query)
+
+    db = SessionLocal()
+
+    try:
+        results = (
+            db.query(DocumentChunk)
+            .order_by(
+                DocumentChunk.embedding.cosine_distance(query_embedding)
+            )
+            .limit(top_k)
+            .all()
+        )
+
+        return [
+            {
+                "document_name": result.document_name,
+                "chunk_index": result.chunk_index,
+                "content": result.content
+            }
+            for result in results
+        ]
+
+    finally:
+        db.close()        

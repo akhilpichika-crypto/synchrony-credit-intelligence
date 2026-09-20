@@ -1,6 +1,10 @@
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
-from backend.app.services.document_service import extract_pdf_text
+from backend.app.services.document_service import (
+    extract_pdf_text,
+    index_document,
+    retrieve_relevant_chunks
+)
 
 
 router = APIRouter(
@@ -9,8 +13,8 @@ router = APIRouter(
 )
 
 
-@router.post("/extract")
-async def extract_document(file: UploadFile = File(...)):
+@router.post("/index")
+async def index_pdf_document(file: UploadFile = File(...)):
 
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
@@ -21,14 +25,19 @@ async def extract_document(file: UploadFile = File(...)):
     try:
         contents = await file.read()
 
-        result = extract_pdf_text(contents)
+        extracted = extract_pdf_text(contents)
+
+        indexed = index_document(
+            document_name=file.filename,
+            text=extracted["full_text"]
+        )
 
         return {
             "filename": file.filename,
-            "status": "processed",
-            "page_count": result["page_count"],
-            "character_count": result["character_count"],
-            "text_preview": result["full_text"][:1000]
+            "status": "indexed",
+            "page_count": extracted["page_count"],
+            "character_count": extracted["character_count"],
+            "chunks_stored": indexed["chunks_stored"]
         }
 
     except ValueError as error:
@@ -36,3 +45,22 @@ async def extract_document(file: UploadFile = File(...)):
             status_code=400,
             detail=str(error)
         )
+
+@router.get("/search")
+def search_documents(query: str, top_k: int = 3):
+
+    if not query.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="Query cannot be empty"
+        )
+
+    results = retrieve_relevant_chunks(
+        query=query,
+        top_k=top_k
+    )
+
+    return {
+        "query": query,
+        "results": results
+    }
