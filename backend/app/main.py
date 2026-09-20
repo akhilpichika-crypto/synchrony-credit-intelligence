@@ -2,7 +2,7 @@ from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
 import joblib
 from fastapi import FastAPI
-
+from backend.app.routers.behavioral import router as behavioral_router
 from backend.app.routers.prediction import create_prediction_router
 
 
@@ -43,3 +43,4 @@ def health():
 
 
 app.include_router(create_prediction_router(model))
+app.include_router(behavioral_router)

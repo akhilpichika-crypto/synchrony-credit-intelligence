@@ -1,0 +1,31 @@
+date,description,amount,type
+2026-01-01,Salary,42000,credit
+2026-01-05,Rent,12000,debit
+2026-01-10,Groceries,5000,debit
+2026-01-18,Utilities,2000,debit
+2026-01-25,Loan Payment,4000,debit
+2026-02-01,Salary,41500,credit
+2026-02-05,Rent,12000,debit
+2026-02-11,Groceries,5200,debit
+2026-02-18,Utilities,1900,debit
+2026-02-25,Loan Payment,4000,debit
+2026-03-01,Salary,43000,credit
+2026-03-05,Rent,12000,debit
+2026-03-12,Groceries,4800,debit
+2026-03-18,Utilities,2100,debit
+2026-03-25,Loan Payment,4000,debit
+2026-04-01,Salary,42500,credit
+2026-04-05,Rent,12000,debit
+2026-04-11,Groceries,5100,debit
+2026-04-18,Utilities,1950,debit
+2026-04-25,Loan Payment,4000,debit
+2026-05-01,Salary,41800,credit
+2026-05-05,Rent,12000,debit
+2026-05-12,Groceries,5000,debit
+2026-05-18,Utilities,2050,debit
+2026-05-25,Loan Payment,4000,debit
+2026-06-01,Salary,42700,credit
+2026-06-05,Rent,12000,debit
+2026-06-11,Groceries,4900,debit
+2026-06-18,Utilities,2000,debit
+2026-06-25,Loan Payment,4000,debit
