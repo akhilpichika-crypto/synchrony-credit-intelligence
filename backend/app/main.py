@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from backend.app.routers.behavioral import router as behavioral_router
 from backend.app.routers.prediction import create_prediction_router
 from backend.app.routers.documents import router as documents_router
+from backend.app.database import Base, engine
+from backend.app.models.document_chunk import DocumentChunk
 
 app = FastAPI(
     title="Next-Gen Credit Intelligence API",
@@ -25,7 +27,7 @@ MODEL_PATH = BASE_DIR / "ml" / "artifacts" / "credit_risk_model.pkl"
 
 model = joblib.load(MODEL_PATH)
 
-
+Base.metadata.create_all(bind=engine)
 @app.get("/")
 def root():
     return {
