@@ -7,6 +7,7 @@ from backend.app.routers.prediction import create_prediction_router
 from backend.app.routers.documents import router as documents_router
 from backend.app.database import Base, engine
 from backend.app.models.document_chunk import DocumentChunk
+from backend.app.routers.intelligence import router as intelligence_router
 
 app = FastAPI(
     title="Next-Gen Credit Intelligence API",
@@ -47,3 +48,4 @@ def health():
 app.include_router(create_prediction_router(model))
 app.include_router(behavioral_router)
 app.include_router(documents_router)
+app.include_router(intelligence_router)
