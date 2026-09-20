@@ -373,3 +373,59 @@ main {
     display: none;
   }
 }
+.factor-list {
+  margin-top: 14px;
+}
+
+.factor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid #e8edf3;
+  gap: 12px;
+}
+
+.factor:last-child {
+  border-bottom: none;
+}
+
+.factor-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.factor-arrow {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.factor-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #344054;
+}
+
+.factor-direction {
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.risk-up {
+  color: #c53b32;
+}
+
+.risk-down {
+  color: #168653;
+}
+
+.shap-note {
+  margin-top: 13px !important;
+  padding-top: 11px;
+  border-top: 1px solid #e8edf3;
+  color: #8794a5 !important;
+  font-size: 10px !important;
+  line-height: 1.5 !important;
+}

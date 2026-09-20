@@ -324,11 +324,46 @@ function App() {
               </div>
 
               <div className="explanation-placeholder">
-                <p className="eyebrow">EXPLAINABILITY</p>
+                <p className="eyebrow">EXPLAINABILITY · SHAP</p>
                 <h3>Key contributing factors</h3>
-                <p>
-                  Feature-level model explanations will appear here
-                  through the explainability layer.
+
+                <div className="factor-list">
+                  {result.top_factors?.map((factor) => (
+                    <div className="factor" key={factor.feature}>
+                      <div className="factor-info">
+                        <span
+                          className={
+                            factor.impact > 0
+                              ? "factor-arrow risk-up"
+                              : "factor-arrow risk-down"
+                          }
+                        >
+                          {factor.impact > 0 ? "↑" : "↓"}
+                        </span>
+
+                        <span className="factor-name">
+                          {factor.feature
+                            .replaceAll("_", " ")
+                            .replace(/\b\w/g, (c) => c.toUpperCase())}
+                        </span>
+                      </div>
+
+                      <span
+                        className={
+                          factor.impact > 0
+                            ? "factor-direction risk-up"
+                            : "factor-direction risk-down"
+                        }
+                      >
+                        {factor.direction}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="shap-note">
+                  SHAP values indicate how each feature influenced this model
+                  prediction and do not imply causation.
                 </p>
               </div>
             </div>
