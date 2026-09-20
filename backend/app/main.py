@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from fastapi.middleware.cors import CORSMiddleware
 import joblib
 from fastapi import FastAPI
 
@@ -10,6 +10,13 @@ app = FastAPI(
     title="Next-Gen Credit Intelligence API",
     description="Explainable credit risk assessment API",
     version="1.0.0"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 BASE_DIR = Path(__file__).resolve().parents[2]
