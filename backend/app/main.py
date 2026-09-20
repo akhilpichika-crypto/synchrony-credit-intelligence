@@ -4,7 +4,7 @@ import joblib
 from fastapi import FastAPI
 from backend.app.routers.behavioral import router as behavioral_router
 from backend.app.routers.prediction import create_prediction_router
-
+from backend.app.routers.documents import router as documents_router
 
 app = FastAPI(
     title="Next-Gen Credit Intelligence API",
@@ -44,3 +44,4 @@ def health():
 
 app.include_router(create_prediction_router(model))
 app.include_router(behavioral_router)
+app.include_router(documents_router)
