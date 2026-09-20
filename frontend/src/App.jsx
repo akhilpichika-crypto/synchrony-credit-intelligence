@@ -60,6 +60,9 @@ function App() {
   const [behaviorResult, setBehaviorResult] = useState(null);
   const [behaviorLoading, setBehaviorLoading] = useState(false);
   const [behaviorError, setBehaviorError] = useState("");
+  const [aiExplanation, setAiExplanation] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
 
   const handleChange = (event) => {
     const { name, value, type } = event.target;
@@ -116,6 +119,60 @@ function App() {
       );
     } finally {
       setBehaviorLoading(false);
+    }
+  };
+
+  const generateAIExplanation = async () => {
+    if (!result) {
+      setAiError("Run the credit risk assessment first.");
+      return;
+    }
+
+    if (!behaviorResult) {
+      setAiError("Analyze the transaction statement first.");
+      return;
+    }
+
+    setAiLoading(true);
+    setAiError("");
+    setAiExplanation("");
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/intelligence/explain",
+        {
+          risk_probability: result.risk_probability,
+          risk_band: result.risk_level,
+
+          shap_factors: result.top_factors.map((factor) => ({
+            feature: factor.feature,
+            shap_value: factor.impact,
+          })),
+
+          behavioral_data: {
+            income_stability: behaviorResult.income_stability,
+            cashflow_consistency: behaviorResult.cashflow_consistency,
+            spending_volatility: behaviorResult.spending_volatility,
+            spending_volatility_score:
+              behaviorResult.spending_volatility_score,
+            average_savings_rate: behaviorResult.average_savings_rate,
+          },
+
+          query:
+            "What evidence describes the applicant's income stability, financial obligations, payment behavior and cash flow?",
+        }
+      );
+
+      setAiExplanation(response.data.explanation);
+    } catch (err) {
+      console.error(err);
+
+      setAiError(
+        err.response?.data?.detail ||
+          "Unable to generate AI explanation."
+      );
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -563,6 +620,50 @@ function App() {
             )}
           </div>
         </div>
+      </section>
+      <section className="behavior-section">
+        <div className="behavior-header">
+          <div>
+            <p className="eyebrow">GENERATIVE AI · GROUNDED RAG</p>
+            <h2>Credit Intelligence Explanation</h2>
+
+            <p className="behavior-description">
+              Generate a grounded explanation using the model assessment,
+              SHAP contributions, behavioral indicators and retrieved
+              supporting-document evidence.
+            </p>
+          </div>
+
+          <span className="synthetic-badge">
+            EXPLAINABILITY ONLY
+          </span>
+        </div>
+
+        <button
+          className="analyze-button"
+          onClick={generateAIExplanation}
+          disabled={aiLoading || !result || !behaviorResult}
+        >
+          {aiLoading
+            ? "Generating Explanation..."
+            : "Generate AI Explanation"}
+        </button>
+
+        {aiError && (
+          <div className="error">{aiError}</div>
+        )}
+
+        {aiExplanation && (
+          <div className="ai-explanation">
+            <pre>{aiExplanation}</pre>
+          </div>
+        )}
+
+        <p className="behavior-note">
+          Gemini explains the supplied model and synthetic evidence.
+          It does not calculate the risk probability or make a credit
+          approval or rejection decision.
+        </p>
       </section>
     </div>
   );
