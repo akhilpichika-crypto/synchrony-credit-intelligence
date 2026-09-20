@@ -429,3 +429,189 @@ main {
   font-size: 10px !important;
   line-height: 1.5 !important;
 }
+.behavior-section {
+  max-width: 1244px;
+  margin: 0 auto 40px;
+  padding: 28px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(31, 45, 61, 0.06);
+}
+
+.behavior-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid #edf1f5;
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+}
+
+.behavior-header h2 {
+  margin: 4px 0 7px;
+  font-size: 21px;
+}
+
+.behavior-description {
+  margin: 0;
+  color: #718096;
+  font-size: 13px;
+}
+
+.synthetic-badge {
+  background: #fff4d6;
+  color: #8a6200;
+  border-radius: 30px;
+  padding: 7px 12px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.behavior-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 30px;
+}
+
+.upload-card {
+  background: #f7f9fc;
+  border-radius: 12px;
+  padding: 22px;
+}
+
+.upload-card h3 {
+  margin-top: 0;
+}
+
+.upload-card p {
+  color: #718096;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.file-upload {
+  display: block;
+  border: 1px dashed #aebccc;
+  background: white;
+  padding: 20px;
+  border-radius: 9px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.file-upload input {
+  display: none;
+}
+
+.analyze-button {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #1769e0;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.analyze-button:disabled {
+  opacity: 0.6;
+}
+
+.behavior-results {
+  min-height: 260px;
+}
+
+.behavior-empty {
+  text-align: center;
+  color: #718096;
+  padding: 45px;
+}
+
+.behavior-empty h3 {
+  color: #344054;
+  margin-bottom: 5px;
+}
+
+.behavior-empty p {
+  font-size: 12px;
+}
+
+.analysis-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 23px;
+  font-size: 12px;
+}
+
+.analysis-meta strong {
+  color: #168653;
+}
+
+.analysis-meta span {
+  color: #718096;
+}
+
+.metric {
+  margin-bottom: 19px;
+}
+
+.metric > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.metric-bar {
+  height: 7px;
+  background: #edf1f5;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.metric-bar div {
+  height: 100%;
+  background: #1769e0;
+  border-radius: 10px;
+}
+
+.volatility-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f7f9fc;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+}
+
+.volatility-card strong {
+  color: #168653;
+}
+
+.volatility-card small {
+  margin-left: auto;
+  color: #8794a5;
+}
+
+.behavior-note {
+  color: #8794a5;
+  font-size: 10px;
+  margin-top: 18px;
+  line-height: 1.5;
+}
+
+@media (max-width: 850px) {
+  .behavior-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .behavior-header {
+    gap: 15px;
+  }
+}

@@ -56,6 +56,10 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [transactionFile, setTransactionFile] = useState(null);
+  const [behaviorResult, setBehaviorResult] = useState(null);
+  const [behaviorLoading, setBehaviorLoading] = useState(false);
+  const [behaviorError, setBehaviorError] = useState("");
 
   const handleChange = (event) => {
     const { name, value, type } = event.target;
@@ -82,6 +86,36 @@ function App() {
       setError("Unable to complete assessment. Check that the API is running.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const analyzeTransactions = async () => {
+    if (!transactionFile) {
+      setBehaviorError("Please select a CSV transaction statement.");
+      return;
+    }
+
+    setBehaviorLoading(true);
+    setBehaviorError("");
+
+    const formData = new FormData();
+    formData.append("file", transactionFile);
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/behavior/analyze",
+        formData
+      );
+
+      setBehaviorResult(response.data);
+    } catch (err) {
+      console.error(err);
+      setBehaviorError(
+        err.response?.data?.detail ||
+          "Unable to analyze transaction statement."
+      );
+    } finally {
+      setBehaviorLoading(false);
     }
   };
 
@@ -375,6 +409,161 @@ function App() {
           </div>
         </section>
       </main>
+      <section className="behavior-section">
+        <div className="behavior-header">
+          <div>
+            <p className="eyebrow">ALTERNATIVE DATA INTELLIGENCE</p>
+            <h2>Transaction Behavior Analysis</h2>
+            <p className="behavior-description">
+              Supplement the traditional credit model with behavioral signals
+              derived from transaction history.
+            </p>
+          </div>
+
+          <span className="synthetic-badge">
+            SYNTHETIC / DEMO DATA
+          </span>
+        </div>
+
+        <div className="behavior-grid">
+          <div className="upload-card">
+            <h3>Transaction Statement</h3>
+
+            <p>
+              Upload a synthetic CSV containing transaction date,
+              description, amount and type.
+            </p>
+
+            <label className="file-upload">
+              <span>
+                {transactionFile
+                  ? transactionFile.name
+                  : "Choose transaction CSV"}
+              </span>
+
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(event) => {
+                  setTransactionFile(event.target.files[0]);
+                  setBehaviorResult(null);
+                  setBehaviorError("");
+                }}
+              />
+            </label>
+
+            <button
+              className="analyze-button"
+              onClick={analyzeTransactions}
+              disabled={behaviorLoading}
+            >
+              {behaviorLoading
+                ? "Analyzing Transactions..."
+                : "Analyze Transactions"}
+            </button>
+
+            {behaviorError && (
+              <div className="error">{behaviorError}</div>
+            )}
+          </div>
+
+          <div className="behavior-results">
+            {!behaviorResult ? (
+              <div className="behavior-empty">
+                <div className="empty-icon">◎</div>
+                <h3>Awaiting transaction data</h3>
+                <p>
+                  Behavioral indicators will appear after the
+                  synthetic transaction statement is analyzed.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="analysis-meta">
+                  <strong>Analysis complete</strong>
+                  <span>
+                    {behaviorResult.months_analyzed} months ·{" "}
+                    {behaviorResult.total_transactions} transactions
+                  </span>
+                </div>
+
+                <div className="metric">
+                  <div>
+                    <span>Income Stability</span>
+                    <strong>
+                      {behaviorResult.income_stability}%
+                    </strong>
+                  </div>
+
+                  <div className="metric-bar">
+                    <div
+                      style={{
+                        width: `${behaviorResult.income_stability}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="metric">
+                  <div>
+                    <span>Cash-flow Consistency</span>
+                    <strong>
+                      {behaviorResult.cashflow_consistency}%
+                    </strong>
+                  </div>
+
+                  <div className="metric-bar">
+                    <div
+                      style={{
+                        width: `${behaviorResult.cashflow_consistency}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="metric">
+                  <div>
+                    <span>Average Savings Rate</span>
+                    <strong>
+                      {behaviorResult.average_savings_rate}%
+                    </strong>
+                  </div>
+
+                  <div className="metric-bar">
+                    <div
+                      style={{
+                        width: `${Math.max(
+                          0,
+                          behaviorResult.average_savings_rate
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="volatility-card">
+                  <span>Spending Volatility</span>
+
+                  <strong>
+                    {behaviorResult.spending_volatility}
+                  </strong>
+
+                  <small>
+                    Variability score:{" "}
+                    {behaviorResult.spending_volatility_score}
+                  </small>
+                </div>
+
+                <p className="behavior-note">
+                  Behavioral indicators supplement the model assessment
+                  and are not incorporated into the trained credit-risk
+                  probability.
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
