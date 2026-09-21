@@ -1,5 +1,5 @@
-from fastapi import APIRouter, File, HTTPException, UploadFile
-
+from fastapi import APIRouter, File, HTTPException, UploadFile,Depends
+from backend.app.services.auth_service import require_role
 from backend.app.services.document_service import (
     extract_pdf_text,
     index_document,
@@ -17,7 +17,10 @@ router = APIRouter(
 
 
 @router.post("/index")
-async def index_pdf_document(file: UploadFile = File(...)):
+async def index_pdf_document(
+    file: UploadFile = File(...),
+    current_user=Depends(require_role("ANALYST")),
+):
 
     # 1. Validate filename
     if not file.filename:
@@ -101,6 +104,7 @@ def search_documents(
     query: str,
     document_name: str,
     top_k: int = 3,
+    current_user=Depends(require_role("ANALYST")),
 ):
 
     if not query.strip():

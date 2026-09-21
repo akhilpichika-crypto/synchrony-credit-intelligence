@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "./App.css";
+import ReactMarkdown from "react-markdown";
 
 const initialForm = {
   checking_status: "A11",
@@ -173,6 +174,61 @@ function App() {
   const [documentLoading, setDocumentLoading] = useState(false);
   const [documentError, setDocumentError] = useState("");
   const [selectedProfile, setSelectedProfile] = useState("custom");
+  const [email, setEmail] = useState("analyst@demo.com");
+  const [password, setPassword] = useState("");
+  const [token, setToken] = useState(
+    localStorage.getItem("access_token") || ""
+  );
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
+
+  const login = async () => {
+    setLoginLoading(true);
+    setLoginError("");
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      const accessToken = response.data.access_token;
+
+      localStorage.setItem("access_token", accessToken);
+      setToken(accessToken);
+      setPassword("");
+    } catch (err) {
+      console.error(err);
+
+      setLoginError(
+        err.response?.data?.detail ||
+          "Unable to sign in."
+      );
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    setToken("");
+    setPassword("");
+
+    setResult(null);
+    setBehaviorResult(null);
+    setAffordabilityResult(null);
+    setDocumentResult(null);
+    setAiExplanation("");
+  };
+
+  const authConfig = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 
   const handleChange = (event) => {
     const { name, value, type } = event.target;
@@ -214,7 +270,8 @@ function App() {
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/predict",
-        predictionPayload
+        predictionPayload,
+        authConfig
       );
 
       setResult(response.data);
@@ -245,7 +302,8 @@ function App() {
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/behavior/analyze",
-        formData
+        formData,
+        authConfig
       );
 
       setBehaviorResult(response.data);
@@ -293,7 +351,8 @@ function App() {
           existing_monthly_obligations: 0,
           risk_band: result.risk_level,
           duration_months: form.duration_months,
-        }
+        },
+        authConfig
       );
 
       setAffordabilityResult(response.data);
@@ -325,7 +384,8 @@ function App() {
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/documents/index",
-        formData
+        formData,
+        authConfig
       );
 
       setDocumentResult(response.data);
@@ -388,7 +448,8 @@ function App() {
           document_name: documentResult.filename,
           query:
             "What evidence describes the applicant's income stability, financial obligations, payment behavior and cash flow?",
-        }
+        },
+        authConfig
       );
 
       setAiExplanation(response.data.explanation);
@@ -406,6 +467,91 @@ function App() {
     }
   };
 
+  if (!token) {
+    return (
+      <div className="app">
+        <header>
+          <div>
+            <div className="brand">
+              CREDIT INTELLIGENCE
+            </div>
+
+            <h1>Next-Gen Underwriting Engine</h1>
+
+            <p>
+              Secure analyst access to the explainable
+              credit intelligence platform.
+            </p>
+          </div>
+        </header>
+
+        <main>
+          <section className="panel applicant-panel">
+            <div className="panel-heading">
+              <div>
+                <p className="eyebrow">
+                  AUTHENTICATION
+                </p>
+
+                <h2>Analyst Login</h2>
+              </div>
+            </div>
+
+            <div className="field">
+              <label>Email</label>
+
+              <input
+                type="email"
+                value={email}
+                onChange={(event) =>
+                  setEmail(event.target.value)
+                }
+              />
+            </div>
+
+            <div className="field">
+              <label>Password</label>
+
+              <input
+                type="password"
+                value={password}
+                onChange={(event) =>
+                  setPassword(event.target.value)
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    login();
+                  }
+                }}
+              />
+            </div>
+
+            <button
+              className="assess-button"
+              onClick={login}
+              disabled={loginLoading}
+            >
+              {loginLoading
+                ? "Signing In..."
+                : "Sign In"}
+            </button>
+
+            {loginError && (
+              <div className="error">
+                {loginError}
+              </div>
+            )}
+
+            <p className="advanced-note">
+              Protected analyst access using JWT bearer
+              authentication.
+            </p>
+          </section>
+        </main>
+      </div>
+    );
+  }
+
   const riskClass = result
     ? result.risk_level.toLowerCase()
     : "";
@@ -422,9 +568,18 @@ function App() {
           </p>
         </div>
 
-        <div className="status">
-          <span></span>
-          Model Online
+        <div>
+          <div className="status">
+            <span></span>
+            Authenticated Analyst
+          </div>
+
+          <button
+            className="analyze-button"
+            onClick={logout}
+          >
+            Logout
+          </button>
         </div>
       </header>
 
@@ -1098,7 +1253,9 @@ function App() {
 
         {aiExplanation && (
           <div className="ai-explanation">
-            <pre>{aiExplanation}</pre>
+            <ReactMarkdown>
+              {aiExplanation}
+            </ReactMarkdown>
           </div>
         )}
 

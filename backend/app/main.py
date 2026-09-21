@@ -11,6 +11,7 @@ from backend.app.routers.intelligence import router as intelligence_router
 from backend.app.routers.affordability import (
     router as affordability_router,
 )
+from backend.app.routers.auth import router as auth_router
 
 app = FastAPI(
     title="Next-Gen Credit Intelligence API",
@@ -53,3 +54,4 @@ app.include_router(behavioral_router)
 app.include_router(documents_router)
 app.include_router(intelligence_router)
 app.include_router(affordability_router)
+app.include_router(auth_router)

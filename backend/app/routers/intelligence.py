@@ -1,6 +1,7 @@
 from typing import Any
-
-from fastapi import APIRouter, HTTPException
+import time
+from fastapi import APIRouter, HTTPException, Depends
+from backend.app.services.auth_service import require_role
 from pydantic import BaseModel, Field
 
 from backend.app.services.document_service import retrieve_relevant_chunks
@@ -46,7 +47,10 @@ class ExplanationRequest(BaseModel):
 
 
 @router.post("/explain")
-def generate_explanation(request: ExplanationRequest):
+def generate_explanation(
+    request: ExplanationRequest,
+    current_user=Depends(require_role("ANALYST")),
+):
 
     # Validate risk band explicitly
     risk_band = request.risk_band.upper()
@@ -58,11 +62,17 @@ def generate_explanation(request: ExplanationRequest):
         )
 
     try:
+        retrieval_start = time.perf_counter()
         evidence = retrieve_relevant_chunks(
             query=request.query,
             document_name=request.document_name,
             top_k=3,
         )
+        retrieval_time = time.perf_counter() - retrieval_start
+        print(
+                f"[TIMING] Semantic retrieval: "
+                f"{retrieval_time:.2f} seconds"
+            )
 
         if not evidence:
             raise HTTPException(
@@ -73,6 +83,8 @@ def generate_explanation(request: ExplanationRequest):
                 ),
             )
 
+        gemini_start = time.perf_counter()
+
         explanation = generate_credit_explanation(
             risk_probability=request.risk_probability,
             risk_band=risk_band,
@@ -82,6 +94,18 @@ def generate_explanation(request: ExplanationRequest):
             ],
             behavioral_data=request.behavioral_data,
             retrieved_evidence=evidence,
+        )
+
+        gemini_time = time.perf_counter() - gemini_start
+
+        print(
+            f"[TIMING] Gemini generation: "
+            f"{gemini_time:.2f} seconds"
+        )
+
+        print(
+            f"[TIMING] Total AI pipeline: "
+            f"{retrieval_time + gemini_time:.2f} seconds"
         )
 
         return {
@@ -97,17 +121,20 @@ def generate_explanation(request: ExplanationRequest):
         raise
 
     except Exception as error:
-        # Log details only on the backend.
-        print(
-            "Credit intelligence explanation error:",
-            repr(error),
-        )
+        print("Credit intelligence explanation error:", repr(error))
 
-        # Do NOT expose Gemini/database/internal errors to client.
+        error_text = str(error).lower()
+
+        if "429" in error_text or "rate limit" in error_text:
+            raise HTTPException(
+                status_code=429,
+                detail=(
+                    "AI explanation service is temporarily rate-limited. "
+                    "Please try again shortly."
+                ),
+            )
+
         raise HTTPException(
             status_code=500,
-            detail=(
-                "Unable to generate the credit intelligence "
-                "explanation at this time."
-            ),
+            detail="Unable to generate credit intelligence explanation."
         )

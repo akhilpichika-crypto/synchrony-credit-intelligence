@@ -1,5 +1,5 @@
-from fastapi import APIRouter, File, HTTPException, UploadFile
-
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from backend.app.services.auth_service import require_role
 from backend.app.services.behavioral_service import analyze_transactions
 
 
@@ -7,11 +7,12 @@ router = APIRouter(
     prefix="/behavior",
     tags=["Behavioral Intelligence"]
 )
-
+MAX_CSV_SIZE = 2 * 1024 * 1024  # 2 MB
 
 @router.post("/analyze")
 async def analyze_transaction_file(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    current_user=Depends(require_role("ANALYST")),
 ):
     # 1. Validate filename
     if not file.filename:

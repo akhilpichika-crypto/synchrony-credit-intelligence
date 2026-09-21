@@ -125,7 +125,7 @@ BEHAVIORAL EVIDENCE
 RETRIEVED DOCUMENT EVIDENCE
 ========================
 
-{retrieved_evidence}
+{evidence_text}
 
 ========================
 RESPONSE REQUIREMENTS
@@ -158,7 +158,7 @@ approval, rejection, lending recommendation, or actual lender pricing.
 """
 
     interaction = client.interactions.create(
-        model="gemini-3.8-flash",
+        model="gemini-3.5-flash-lite",
         input=prompt
     )
 

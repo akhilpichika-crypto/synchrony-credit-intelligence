@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from backend.app.services.auth_service import require_role
 from pydantic import BaseModel
 
 from backend.app.services.affordability_service import (
@@ -22,7 +23,12 @@ class AffordabilityRequest(BaseModel):
 
 
 @router.post("/analyze")
-def analyze_affordability(request: AffordabilityRequest):
+def analyze_affordability(
+    request: AffordabilityRequest,
+    current_user=Depends(
+        require_role("ANALYST", "ADMIN")
+    ),
+):
     try:
         risk_band = request.risk_band.upper()
 
@@ -38,9 +44,7 @@ def analyze_affordability(request: AffordabilityRequest):
             city=request.city,
         )
 
-        estimated_apr = PROTOTYPE_APR_BY_RISK[
-            risk_band
-        ]
+        estimated_apr = PROTOTYPE_APR_BY_RISK[risk_band]
 
         loan_capacity = calculate_loan_capacity(
             affordable_emi=affordability["affordable_emi"],
@@ -50,19 +54,13 @@ def analyze_affordability(request: AffordabilityRequest):
 
         return {
             **affordability,
-
             "risk_band": risk_band,
-
             "estimated_apr": estimated_apr,
-
             "duration_months": request.duration_months,
-
             "indicative_loan_capacity": loan_capacity,
-
             "pricing_basis": (
                 "Illustrative prototype APR based on model risk band"
             ),
-
             "disclaimer": (
                 "Prototype affordability estimate only. "
                 "Not a lending offer, approval, or actual lender pricing."
