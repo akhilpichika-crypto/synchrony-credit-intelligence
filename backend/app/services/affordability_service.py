@@ -1,5 +1,7 @@
 import math
+import logging
 
+logger = logging.getLogger("credit_intelligence")
 
 # Prototype city living-cost references.
 # These are DEMO assumptions, not lender policy or official cost-of-living data.
@@ -159,6 +161,12 @@ def calculate_loan_capacity(
         affordable_emi
         * (factor - 1)
         / (monthly_rate * factor)
+    )
+
+    logger.info(
+        "Loan capacity calculated | duration_months=%s | prototype_apr=%.1f",
+        duration_months,
+        annual_apr,
     )
 
     return round(loan_capacity, 2)

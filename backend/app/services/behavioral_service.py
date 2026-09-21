@@ -1,6 +1,10 @@
 import io
+import logging
 import pandas as pd
 import numpy as np
+
+
+logger = logging.getLogger("credit_intelligence")
 
 
 def analyze_transactions(file_bytes: bytes):
@@ -116,6 +120,13 @@ def analyze_transactions(file_bytes: bytes):
     monthly_net_cashflow = income - expenses
     median_monthly_net_cashflow = float(
         monthly_net_cashflow.median()
+    )
+
+    logger.info(
+        "Transaction analysis completed | months=%s | transactions=%s | spending_volatility=%s",
+        len(months),
+        len(df),
+        spending_volatility,
     )
     return {
         "data_source": "synthetic_transaction_statement",

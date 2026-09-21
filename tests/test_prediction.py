@@ -26,28 +26,14 @@ def get_auth_headers():
 
 
 VALID_APPLICANT = {
-    "checking_status": "A13",
-    "duration_months": 12,
-    "credit_history": "A32",
-    "purpose": "A43",
-    "credit_amount": 3000,
-    "savings_status": "A64",
-    "employment_status": "A75",
-    "installment_rate": 2,
-    "personal_status": "A93",
-    "other_debtors": "A101",
-    "residence_duration": 4,
-    "property": "A121",
     "age": 42,
-    "other_installment_plans": "A143",
-    "housing": "A152",
-    "existing_credits": 1,
-    "job": "A173",
-    "dependents": 2,
-    "telephone": "A192",
-    "foreign_worker": "A201",
+    "annual_income": 744000,
+    "requested_loan_amount": 150000,
+    "home_ownership": "OWN",
+    "employment_duration": 8,
+    "loan_intent": "PERSONAL",
+    "duration_months": 12,
 }
-
 
 def test_valid_prediction():
     response = client.post(
@@ -93,7 +79,7 @@ def test_invalid_applicant_age():
 
 def test_missing_required_field():
     invalid_applicant = VALID_APPLICANT.copy()
-    del invalid_applicant["credit_amount"]
+    del invalid_applicant["requested_loan_amount"]
 
     response = client.post(
         "/predict",

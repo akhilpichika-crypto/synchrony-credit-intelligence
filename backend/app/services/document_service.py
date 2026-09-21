@@ -1,8 +1,12 @@
 import io
+import logging
 from pypdf import PdfReader
 from backend.app.database import SessionLocal
 from backend.app.models.document_chunk import DocumentChunk
 from backend.app.services.embedding_service import chunk_text, generate_embedding
+
+
+logger = logging.getLogger("credit_intelligence")
 
 
 def extract_pdf_text(file_bytes: bytes):
@@ -80,6 +84,12 @@ def index_document(document_name: str, text: str):
 
         db.commit()
 
+        logger.info(
+            "Supporting document indexed | document=%s | chunks=%s",
+            document_name,
+            len(chunks),
+        )
+
         return {
             "document_name": document_name,
             "chunks_stored": len(chunks)
@@ -122,6 +132,12 @@ def retrieve_relevant_chunks(
             )
             .limit(top_k)
             .all()
+        )
+
+        logger.info(
+            "RAG retrieval completed | document=%s | chunks_retrieved=%s",
+            document_name,
+            len(results),
         )
 
         return [

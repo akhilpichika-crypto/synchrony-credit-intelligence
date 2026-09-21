@@ -1,0 +1,6 @@
+profile_id,label,requested_loan_amount,annual_income,duration_months,city,age,home_ownership,employment_duration,loan_intent
+government_employee,Government Employee,150000,744000,12,Hyderabad,42,OWN,8,PERSONAL
+street_vendor,Street Vendor,50000,360000,24,Chennai,34,RENT,3,VENTURE
+doctor_private_practice,Doctor - Private Practice,300000,1800000,18,Bengaluru,45,OWN,10,PERSONAL
+delivery_worker,Delivery Worker,75000,420000,18,Pune,27,RENT,2,PERSONAL
+textile_worker,Textile Shop Worker,100000,480000,12,Hyderabad,36,RENT,5,PERSONAL

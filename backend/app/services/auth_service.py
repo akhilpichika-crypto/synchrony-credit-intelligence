@@ -5,9 +5,10 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import bcrypt
 import jwt
 from dotenv import load_dotenv
-
+import logging
 
 load_dotenv()
+logger = logging.getLogger("credit_intelligence")
 
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
@@ -85,10 +86,19 @@ def get_current_user(
         role = payload.get("role")
 
         if not email or not role:
+            logger.warning(
+                "Authentication failed | reason=missing_token_claims"
+            )
+
             raise HTTPException(
                 status_code=401,
                 detail="Invalid authentication token.",
             )
+
+        logger.info(
+            "Authentication successful | role=%s",
+            role,
+        )
 
         return {
             "email": email,
@@ -96,12 +106,20 @@ def get_current_user(
         }
 
     except jwt.ExpiredSignatureError:
+        logger.warning(
+            "Authentication failed | reason=expired_token"
+        )
+
         raise HTTPException(
             status_code=401,
             detail="Authentication token has expired.",
         )
 
     except jwt.InvalidTokenError:
+        logger.warning(
+            "Authentication failed | reason=invalid_token"
+        )
+
         raise HTTPException(
             status_code=401,
             detail="Invalid authentication token.",
@@ -112,10 +130,22 @@ def require_role(*allowed_roles):
         current_user=Depends(get_current_user),
     ):
         if current_user["role"] not in allowed_roles:
+
+            logger.warning(
+                "Authorization denied | role=%s | required_roles=%s",
+                current_user["role"],
+                allowed_roles,
+            )
+
             raise HTTPException(
                 status_code=403,
                 detail="You do not have permission to perform this action.",
             )
+
+        logger.info(
+            "Authorization successful | role=%s",
+            current_user["role"],
+        )
 
         return current_user
 

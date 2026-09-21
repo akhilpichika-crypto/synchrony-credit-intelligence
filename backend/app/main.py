@@ -12,12 +12,21 @@ from backend.app.routers.affordability import (
     router as affordability_router,
 )
 from backend.app.routers.auth import router as auth_router
+import logging
+from backend.app.core.logging_config import setup_logging
+
+setup_logging()
+
+logger = logging.getLogger("credit_intelligence")
 
 app = FastAPI(
     title="Next-Gen Credit Intelligence API",
     description="Explainable credit risk assessment API",
     version="1.0.0"
 )
+
+logger.info("Credit Intelligence API started")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -28,9 +37,10 @@ app.add_middleware(
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
-MODEL_PATH = BASE_DIR / "ml" / "artifacts" / "credit_risk_model.pkl"
+MODEL_PATH = BASE_DIR / "ml" / "artifacts" / "loan_risk_model.pkl"
 
-model = joblib.load(MODEL_PATH)
+artifact = joblib.load(MODEL_PATH)
+model = artifact["pipeline"]
 
 Base.metadata.create_all(bind=engine)
 @app.get("/")

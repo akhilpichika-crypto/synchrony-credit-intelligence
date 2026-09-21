@@ -1,131 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
 import ReactMarkdown from "react-markdown";
+import Papa from "papaparse";
 
 const initialForm = {
-  checking_status: "A11",
-  duration_months: 6,
+  requested_loan_amount: 100000,
+  annual_income: 600000,
+  duration_months: 12,
   city: "Hyderabad",
-  credit_history: "A34",
-  purpose: "A43",
-  credit_amount: 1169,
-  savings_status: "A65",
-  employment_status: "A75",
-  installment_rate: 4,
-  personal_status: "A93",
-  other_debtors: "A101",
-  residence_duration: 4,
-  property: "A121",
-  age: 67,
-  other_installment_plans: "A143",
-  housing: "A152",
-  existing_credits: 2,
-  job: "A173",
-  dependents: 1,
-  telephone: "A192",
-  foreign_worker: "A201",
-};
-const demoProfiles = {
-  custom: {
-    label: "Custom Applicant",
-    form: initialForm,
-  },
-
-  government_employee: {
-    label: "Government Employee",
-    form: {
-      ...initialForm,
-      checking_status: "A13",
-      duration_months: 12,
-      city: "Hyderabad",
-      credit_history: "A32",
-      credit_amount: 3000,
-      savings_status: "A64",
-      employment_status: "A75",
-      installment_rate: 2,
-      age: 42,
-      housing: "A152",
-      existing_credits: 1,
-      dependents: 2,
-    },
-  },
-
-  street_vendor: {
-    label: "Street Vendor",
-    form: {
-      ...initialForm,
-      checking_status: "A11",
-      duration_months: 24,
-      city: "Chennai",
-      credit_history: "A30",
-      credit_amount: 4500,
-      savings_status: "A61",
-      employment_status: "A73",
-      installment_rate: 4,
-      age: 34,
-      housing: "A151",
-      existing_credits: 1,
-      dependents: 2,
-    },
-  },
-
-  doctor_private_practice: {
-    label: "Doctor – Private Practice",
-    form: {
-      ...initialForm,
-      checking_status: "A13",
-      duration_months: 18,
-      city: "Bengaluru",
-      credit_history: "A32",
-      credit_amount: 8000,
-      savings_status: "A64",
-      employment_status: "A75",
-      installment_rate: 2,
-      age: 45,
-      housing: "A152",
-      existing_credits: 2,
-      dependents: 2,
-    },
-  },
-
-  delivery_worker: {
-    label: "Delivery Worker",
-    form: {
-      ...initialForm,
-      checking_status: "A12",
-      duration_months: 18,
-      city: "Pune",
-      credit_history: "A32",
-      credit_amount: 2500,
-      savings_status: "A62",
-      employment_status: "A73",
-      installment_rate: 3,
-      age: 27,
-      housing: "A151",
-      existing_credits: 1,
-      dependents: 1,
-    },
-  },
-
-  textile_worker: {
-    label: "Textile Shop Worker",
-    form: {
-      ...initialForm,
-      checking_status: "A12",
-      duration_months: 12,
-      city: "Hyderabad",
-      credit_history: "A32",
-      credit_amount: 2000,
-      savings_status: "A62",
-      employment_status: "A74",
-      installment_rate: 3,
-      age: 36,
-      housing: "A151",
-      existing_credits: 1,
-      dependents: 2,
-    },
-  },
+  age: 30,
+  home_ownership: "RENT",
+  employment_duration: 3,
+  loan_intent: "PERSONAL",
 };
 
 const SelectField = ({ label, name, value, options, onChange }) => (
@@ -182,6 +69,46 @@ function App() {
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [inputsModified, setInputsModified] = useState(false);
+  const [demoProfiles, setDemoProfiles] = useState({});
+
+  useEffect(() => {
+    Papa.parse("/data/demo_applicants.csv", {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+
+      complete: (results) => {
+        const profiles = {
+          custom: {
+            label: "Custom Applicant",
+            form: initialForm,
+          },
+        };
+
+        results.data.forEach((row) => {
+          profiles[row.profile_id] = {
+            label: row.label,
+            form: {
+              requested_loan_amount: Number(row.requested_loan_amount),
+              annual_income: Number(row.annual_income),
+              duration_months: Number(row.duration_months),
+              city: row.city,
+              age: Number(row.age),
+              home_ownership: row.home_ownership,
+              employment_duration: Number(row.employment_duration),
+              loan_intent: row.loan_intent,
+            },
+          };
+        });
+
+        setDemoProfiles(profiles);
+      },
+
+      error: (error) => {
+        console.error("Unable to load demo applicants:", error);
+      },
+    });
+  }, []);
 
   const login = async () => {
     setLoginLoading(true);
@@ -269,7 +196,15 @@ function App() {
 
     // City is used by the affordability engine,
     // not by the trained credit-risk model.
-    const { city, ...predictionPayload } = form;
+    const predictionPayload = {
+      age: form.age,
+      annual_income: form.annual_income,
+      requested_loan_amount: form.requested_loan_amount,
+      home_ownership: form.home_ownership,
+      employment_duration: form.employment_duration,
+      loan_intent: form.loan_intent,
+      duration_months: form.duration_months,
+    };
 
     try {
       const response = await axios.post(
@@ -526,19 +461,56 @@ function App() {
           <div className="panel-heading"><div><p className="eyebrow">01 · APPLICATION</p><h2>Applicant Workspace</h2><p>Load a synthetic profile or edit any field before assessment.</p></div><span className="profile-chip">{profileLabel}</span></div>
           <div className="demo-selector"><div><strong>Demo Applicant</strong><small>Prefills editable model attributes</small></div><select value={selectedProfile} onChange={handleDemoProfileChange}>{Object.entries(demoProfiles).map(([key,p])=><option key={key} value={key}>{p.label}</option>)}</select></div>
           <div className="form-grid">
-            <NumberField label="Credit Amount" name="credit_amount" value={form.credit_amount} onChange={handleChange}/>
+            <NumberField
+              label="Requested Loan Amount (₹)"
+              name="requested_loan_amount"
+              value={form.requested_loan_amount}
+              min={1000}
+              onChange={handleChange}
+            />
+            <NumberField
+              label="Annual Income (₹)"
+              name="annual_income"
+              value={form.annual_income}
+              min={10000}
+              onChange={handleChange}
+            />
             <NumberField label="Duration (months)" name="duration_months" value={form.duration_months} onChange={handleChange}/>
             <SelectField label="City" name="city" value={form.city} onChange={handleChange} options={[["Hyderabad","Hyderabad"],["Bengaluru","Bengaluru"],["Chennai","Chennai"],["Mumbai","Mumbai"],["Delhi","Delhi"],["Pune","Pune"]]}/>
             <NumberField label="Age" name="age" value={form.age} min={18} onChange={handleChange}/>
-            <NumberField label="Installment Rate" name="installment_rate" value={form.installment_rate} onChange={handleChange}/>
-            <SelectField label="Checking Account" name="checking_status" value={form.checking_status} onChange={handleChange} options={[["A11","Below 0 DM"],["A12","0–200 DM"],["A13","200+ DM"],["A14","No checking account"]]}/>
-            <SelectField label="Credit History" name="credit_history" value={form.credit_history} onChange={handleChange} options={[["A30","No previous credit"],["A31","All credits paid"],["A32","Credits paid properly"],["A33","Payment delays"],["A34","Critical / other credits"]]}/>
-            <SelectField label="Purpose" name="purpose" value={form.purpose} onChange={handleChange} options={[["A40","New car"],["A41","Used car"],["A42","Furniture / equipment"],["A43","Radio / television"],["A44","Domestic appliances"],["A45","Repairs"],["A46","Education"],["A48","Retraining"],["A49","Business"],["A410","Other"]]}/>
-            <SelectField label="Savings" name="savings_status" value={form.savings_status} onChange={handleChange} options={[["A61","Below 100 DM"],["A62","100–500 DM"],["A63","500–1000 DM"],["A64","1000+ DM"],["A65","Unknown / no savings"]]}/>
-            <SelectField label="Employment" name="employment_status" value={form.employment_status} onChange={handleChange} options={[["A71","Unemployed"],["A72","Less than 1 year"],["A73","1–4 years"],["A74","4–7 years"],["A75","7+ years"]]}/>
-            <SelectField label="Housing" name="housing" value={form.housing} onChange={handleChange} options={[["A151","Rent"],["A152","Own"],["A153","Free"]]}/>
-            <NumberField label="Existing Credits" name="existing_credits" value={form.existing_credits} onChange={handleChange}/>
-            <NumberField label="Dependents" name="dependents" value={form.dependents} onChange={handleChange}/>
+            <SelectField
+              label="Home Ownership"
+              name="home_ownership"
+              value={form.home_ownership}
+              onChange={handleChange}
+              options={[
+                ["RENT", "Rent"],
+                ["OWN", "Own"],
+                ["MORTGAGE", "Mortgage"],
+                ["OTHER", "Other"],
+              ]}
+            />
+            <NumberField
+              label="Employment Duration (years)"
+              name="employment_duration"
+              value={form.employment_duration}
+              min={0}
+              onChange={handleChange}
+            />
+            <SelectField
+              label="Loan Purpose"
+              name="loan_intent"
+              value={form.loan_intent}
+              onChange={handleChange}
+              options={[
+                ["PERSONAL", "Personal"],
+                ["EDUCATION", "Education"],
+                ["MEDICAL", "Medical"],
+                ["VENTURE", "Business / Venture"],
+                ["HOMEIMPROVEMENT", "Home Improvement"],
+                ["DEBTCONSOLIDATION", "Debt Consolidation"],
+              ]}
+            />
           </div>
           <div className="info-strip">ⓘ Occupation labels are demo context only; the model uses the editable credit attributes above.</div>
           {inputsModified && <div className="stale-warning">↻ Applicant inputs modified <strong>Re-run assessment to refresh risk & SHAP</strong></div>}
@@ -555,7 +527,7 @@ function App() {
             </div>
             {inputsModified && <div className="stale-overlay-note">Displayed result reflects the previous inputs.</div>}
             <div className="shap-block"><div className="section-minihead"><div><p className="eyebrow">EXPLAINABILITY · SHAP</p><h3>Key model drivers</h3></div><span>Contribution to prediction</span></div>
-              <div className="factor-list">{result.top_factors?.map((f)=><div className="factor" key={f.feature}><div className={`factor-icon ${f.impact>0?'risk-up-bg':'risk-down-bg'}`}>{f.impact>0?'↑':'↓'}</div><div className="factor-main"><strong>{f.feature.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}</strong><small>{f.impact>0?'Pushes toward higher modeled risk':'Pushes toward lower modeled risk'}</small></div><span className={f.impact>0?'risk-up':'risk-down'}>{f.direction}</span></div>)}</div>
+              <div className="factor-list">{result.top_factors?.map((f)=><div className="factor" key={f.feature}><div className={`factor-icon ${f.impact>0?'risk-up-bg':'risk-down-bg'}`}>{f.impact>0?'↑':'↓'}</div><div className="factor-main"><strong>{f.feature.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()).replace(/\bInr\b/g, "INR")}</strong><small>{f.impact>0?'Pushes toward higher modeled risk':'Pushes toward lower modeled risk'}</small></div><span className={f.impact>0?'risk-up':'risk-down'}>{f.direction}</span></div>)}</div>
               <p className="micro-note">SHAP describes model influence, not causation. The output is decision support and not an automated approval or denial.</p>
             </div>
           </>}
@@ -573,7 +545,49 @@ function App() {
       <section className="full-section capacity-section">
         <div className="section-header"><div><p className="eyebrow">04 · REPAYMENT CAPACITY</p><h2>Affordability Intelligence</h2><p>Illustrative capacity analysis using observed cash flow and city living-cost reference.</p></div><button className="secondary-button compact" onClick={analyzeAffordability} disabled={affordabilityLoading||!result||!behaviorResult}>{affordabilityLoading?"Calculating...": affordabilityResult ? "↻ Recalculate Capacity": "Calculate Capacity  →"}</button></div>
         {affordabilityError&&<div className="error">{affordabilityError}</div>}
-        {!affordabilityResult?<div className="empty-inline centered"><span>₹</span><div><h3>Capacity model ready</h3><p>Complete risk and transaction analysis to calculate repayment capacity.</p></div></div>:<><div className="capacity-grid"><StatCard label="Stable Monthly Income" value={`₹${affordabilityResult.stable_monthly_income.toLocaleString()}`} /><StatCard label="Living Expense Used" value={`₹${affordabilityResult.living_expense_used.toLocaleString()}`} sub={`${form.city} reference considered`} /><StatCard label="Repayment Surplus" value={`₹${affordabilityResult.repayment_surplus.toLocaleString()}`} /><StatCard label="Safety Buffer" value={`₹${affordabilityResult.safety_buffer.toLocaleString()}`} /></div><div className="capacity-hero"><div><span>AFFORDABLE EMI</span><strong>₹{affordabilityResult.affordable_emi.toLocaleString()}</strong><small>Illustrative monthly capacity</small></div><i></i><div><span>INDICATIVE LOAN CAPACITY</span><strong>₹{affordabilityResult.indicative_loan_capacity.toLocaleString()}</strong><small>{affordabilityResult.duration_months} months · {affordabilityResult.estimated_apr}% prototype APR</small></div></div><p className="micro-note">City references, safety buffer, APR and capacity are prototype assumptions — not a lending offer, approval or actual lender pricing.</p></>}
+        {!affordabilityResult?<div className="empty-inline centered"><span>₹</span><div><h3>Capacity model ready</h3><p>Complete risk and transaction analysis to calculate repayment capacity.</p></div></div>:<><div className="capacity-grid"><StatCard label="Stable Monthly Income" value={`₹${affordabilityResult.stable_monthly_income.toLocaleString()}`} /><StatCard label="Living Expense Used" value={`₹${affordabilityResult.living_expense_used.toLocaleString()}`} sub={`${form.city} reference considered`} /><StatCard label="Repayment Surplus" value={`₹${affordabilityResult.repayment_surplus.toLocaleString()}`} /><StatCard label="Safety Buffer" value={`₹${affordabilityResult.safety_buffer.toLocaleString()}`} /></div><div className="capacity-hero"><div><span>AFFORDABLE EMI</span><strong>₹{affordabilityResult.affordable_emi.toLocaleString()}</strong><small>Illustrative monthly capacity</small></div><i></i><div><span>INDICATIVE LOAN CAPACITY</span><strong>₹{(Math.round(affordabilityResult.indicative_loan_capacity / 1000) * 1000).toLocaleString('en-IN')}</strong><small>{affordabilityResult.duration_months} months · {affordabilityResult.estimated_apr}% prototype APR</small></div></div>
+        <div className="loan-comparison">
+        <div>
+          <span>REQUESTED LOAN</span>
+          <strong>
+            ₹{form.requested_loan_amount.toLocaleString()}
+          </strong>
+        </div>
+
+        <div>
+          <span>INDICATIVE CAPACITY</span>
+          <strong>
+            ₹{(Math.round(affordabilityResult.indicative_loan_capacity / 1000) * 1000).toLocaleString("en-IN")}
+          </strong>
+        </div>
+
+        <div>
+          <span>CAPACITY ASSESSMENT</span>
+
+          <strong>
+            {form.requested_loan_amount <=
+            affordabilityResult.indicative_loan_capacity ? (
+              <>
+                <span style={{ color: "#16a34a" }}>✓</span>
+                {" "}Within Indicative Capacity
+              </>
+            ) : (
+              "⚠ Exceeds Indicative Capacity"
+            )}
+          </strong>
+
+          <small style={{ display: "block", marginTop: "6px" }}>
+            Capacity coverage:{" "}
+            {(
+              (affordabilityResult.indicative_loan_capacity /
+                form.requested_loan_amount) *
+              100
+            ).toFixed(0)}
+            %
+          </small>
+        </div>
+      </div>
+        <p className="micro-note">City references, safety buffer, APR and capacity are prototype assumptions — not a lending offer, approval or actual lender pricing.</p></>}
       </section>
 
       <section className="full-section evidence-section">

@@ -12,7 +12,7 @@ def explain_prediction(model, applicant_data: dict, top_n: int = 5):
     input_df = pd.DataFrame([applicant_data])
 
     preprocessor = model.named_steps["preprocessor"]
-    classifier = model.named_steps["classifier"]
+    classifier = model.named_steps["model"]
 
     # Apply the exact preprocessing learned during training
     transformed_input = preprocessor.transform(input_df)

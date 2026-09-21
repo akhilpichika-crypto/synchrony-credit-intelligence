@@ -1,9 +1,10 @@
 import os
-
+import logging
 from dotenv import load_dotenv
 from google import genai
 
 load_dotenv()
+logger = logging.getLogger("credit_intelligence")
 
 api_key = os.getenv("GEMINI_API_KEY")
 
@@ -160,6 +161,11 @@ approval, rejection, lending recommendation, or actual lender pricing.
     interaction = client.interactions.create(
         model="gemini-3.5-flash-lite",
         input=prompt
+    )
+
+    logger.info(
+        "Grounded AI explanation generated successfully | model=%s",
+        "gemini-3.5-flash-lite",
     )
 
     return interaction.output_text
