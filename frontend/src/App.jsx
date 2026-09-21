@@ -181,6 +181,7 @@ function App() {
   );
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [inputsModified, setInputsModified] = useState(false);
 
   const login = async () => {
     setLoginLoading(true);
@@ -237,6 +238,8 @@ function App() {
       ...previous,
       [name]: type === "number" ? Number(value) : value,
     }));
+
+    if (result) setInputsModified(true);
   };
 
   const handleDemoProfileChange = (event) => {
@@ -244,6 +247,7 @@ function App() {
 
     setSelectedProfile(profileKey);
     setForm({ ...demoProfiles[profileKey].form });
+    setInputsModified(false);
 
     // Clear old results when applicant changes
     setResult(null);
@@ -275,6 +279,7 @@ function App() {
       );
 
       setResult(response.data);
+      setInputsModified(false);
     } catch (err) {
       console.error(err);
       setError(
@@ -469,804 +474,132 @@ function App() {
 
   if (!token) {
     return (
-      <div className="app">
-        <header>
-          <div>
-            <div className="brand">
-              CREDIT INTELLIGENCE
+      <div className="app login-page">
+        <div className="login-orb orb-one"></div><div className="login-orb orb-two"></div>
+        <section className="login-shell">
+          <div className="login-brand-panel">
+            <div className="brand-lockup"><span className="brand-mark">CI</span><span>CREDIT INTELLIGENCE</span></div>
+            <div className="login-copy">
+              <span className="hero-kicker">EXPLAINABLE · MULTI-MODAL · GROUNDED</span>
+              <h1>Decision intelligence<br/>for modern credit.</h1>
+              <p>Risk modeling, behavioral signals and grounded evidence — unified in one analyst workspace.</p>
+              <div className="login-feature-row"><span>◈ ML + SHAP</span><span>◈ pgvector RAG</span><span>◈ Guardrailed AI</span></div>
             </div>
-
-            <h1>Next-Gen Underwriting Engine</h1>
-
-            <p>
-              Secure analyst access to the explainable
-              credit intelligence platform.
-            </p>
+            <div className="login-security">● Secure prototype workspace <span>JWT protected</span></div>
           </div>
-        </header>
-
-        <main>
-          <section className="panel applicant-panel">
-            <div className="panel-heading">
-              <div>
-                <p className="eyebrow">
-                  AUTHENTICATION
-                </p>
-
-                <h2>Analyst Login</h2>
-              </div>
-            </div>
-
-            <div className="field">
-              <label>Email</label>
-
-              <input
-                type="email"
-                value={email}
-                onChange={(event) =>
-                  setEmail(event.target.value)
-                }
-              />
-            </div>
-
-            <div className="field">
-              <label>Password</label>
-
-              <input
-                type="password"
-                value={password}
-                onChange={(event) =>
-                  setPassword(event.target.value)
-                }
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    login();
-                  }
-                }}
-              />
-            </div>
-
-            <button
-              className="assess-button"
-              onClick={login}
-              disabled={loginLoading}
-            >
-              {loginLoading
-                ? "Signing In..."
-                : "Sign In"}
-            </button>
-
-            {loginError && (
-              <div className="error">
-                {loginError}
-              </div>
-            )}
-
-            <p className="advanced-note">
-              Protected analyst access using JWT bearer
-              authentication.
-            </p>
-          </section>
-        </main>
+          <div className="login-card">
+            <div className="login-card-icon">↗</div><p className="eyebrow">ANALYST WORKSPACE</p><h2>Analyst sign in</h2>
+            <p className="muted">Secure access to the underwriting decision-support workspace.</p>
+            <div className="field"><label>Work email</label><input type="email" value={email} onChange={(e)=>setEmail(e.target.value)} /></div>
+            <div className="field"><label>Password</label><input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} onKeyDown={(e)=>{if(e.key==="Enter") login();}} /></div>
+            <button className="primary-button" onClick={login} disabled={loginLoading}>{loginLoading ? "Authenticating..." : "Sign in to workspace  →"}</button>
+            {loginError && <div className="error">{loginError}</div>}
+            <div className="security-line">◉ JWT bearer authentication · Role protected</div>
+          </div>
+        </section>
       </div>
     );
   }
 
-  const riskClass = result
-    ? result.risk_level.toLowerCase()
-    : "";
+  const riskClass = result ? result.risk_level.toLowerCase() : "";
+  const profileLabel = demoProfiles[selectedProfile]?.label || "Custom Applicant";
 
   return (
-    <div className="app">
-      <header>
-        <div>
-          <div className="brand">CREDIT INTELLIGENCE</div>
-          <h1>Next-Gen Underwriting Engine</h1>
-          <p>
-            Explainable AI-powered credit risk assessment for
-            new-to-credit and thin-file applicants.
-          </p>
-        </div>
-
-        <div>
-          <div className="status">
-            <span></span>
-            Authenticated Analyst
-          </div>
-
-          <button
-            className="analyze-button"
-            onClick={logout}
-          >
-            Logout
-          </button>
-        </div>
+    <div className="app dashboard-app">
+      <header className="topbar">
+        <div className="brand-lockup"><span className="brand-mark">CI</span><div><strong>CREDIT INTELLIGENCE</strong><small>UNDERWRITING CONSOLE</small></div></div>
+        <div className="topbar-center"><span className="live-dot"></span> Decision Engine Online <span className="topbar-divider"></span> <span>Prototype Environment</span></div>
+        <div className="analyst-actions"><div className="analyst-avatar">A</div><div><strong>Analyst</strong><small>Authenticated</small></div><button className="ghost-button" onClick={logout}>Logout</button></div>
       </header>
 
-      <main>
-        <section className="panel applicant-panel">
-          <div className="panel-heading">
-            <div>
-              <p className="eyebrow">APPLICATION</p>
-              <h2>Applicant Profile</h2>
-            </div>
-            <div className="step">01</div>
-          </div>
-          <div className="field">
-            <label>Demo Profile</label>
+      <div className="hero-strip">
+        <div><p className="eyebrow light">UNDERWRITING INTELLIGENCE PLATFORM</p><h1>Credit decisions, explained with evidence</h1><p>A unified analyst workspace for model risk, cash-flow signals, affordability and grounded evidence.</p></div>
+        <div className="hero-pills"><span>ML Risk</span><span>SHAP</span><span>Alternative Data</span><span>RAG</span><span>Gemini</span></div>
+      </div>
 
-            <select
-              value={selectedProfile}
-              onChange={handleDemoProfileChange}
-            >
-              {Object.entries(demoProfiles).map(([key, profile]) => (
-                <option key={key} value={key}>
-                  {profile.label}
-                </option>
-              ))}
-            </select>
-          </div>
+      <div className="workflow-bar">
+        {[['01','Applicant'],['02','Risk'],['03','Behavior'],['04','Capacity'],['05','Evidence'],['06','AI Insight']].map(([n,t],i)=><div className="workflow-step" key={n}><span>{n}</span><strong>{t}</strong>{i<5 && <i>→</i>}</div>)}
+      </div>
 
-          <p className="advanced-note">
-            Selecting a demo profile loads synthetic applicant attributes.
-            Occupation itself is not used as a credit-risk feature.
-          </p>
-
+      <main className="workspace">
+        <section className="panel applicant-panel premium-panel">
+          <div className="panel-heading"><div><p className="eyebrow">01 · APPLICATION</p><h2>Applicant Workspace</h2><p>Load a synthetic profile or edit any field before assessment.</p></div><span className="profile-chip">{profileLabel}</span></div>
+          <div className="demo-selector"><div><strong>Demo Applicant</strong><small>Prefills editable model attributes</small></div><select value={selectedProfile} onChange={handleDemoProfileChange}>{Object.entries(demoProfiles).map(([key,p])=><option key={key} value={key}>{p.label}</option>)}</select></div>
           <div className="form-grid">
-            <NumberField
-              label="Credit Amount"
-              name="credit_amount"
-              value={form.credit_amount}
-              onChange={handleChange}
-            />
-
-            <NumberField
-              label="Duration (months)"
-              name="duration_months"
-              value={form.duration_months}
-              onChange={handleChange}
-            />
-
-            <SelectField
-              label="City"
-              name="city"
-              value={form.city}
-              onChange={handleChange}
-              options={[
-                ["Hyderabad", "Hyderabad"],
-                ["Bengaluru", "Bengaluru"],
-                ["Chennai", "Chennai"],
-                ["Mumbai", "Mumbai"],
-                ["Delhi", "Delhi"],
-                ["Pune", "Pune"],
-              ]}
-            />
-
-            <NumberField
-              label="Age"
-              name="age"
-              value={form.age}
-              min={18}
-              onChange={handleChange}
-            />
-
-            <NumberField
-              label="Installment Rate"
-              name="installment_rate"
-              value={form.installment_rate}
-              onChange={handleChange}
-            />
-
-            <SelectField
-              label="Checking Account"
-              name="checking_status"
-              value={form.checking_status}
-              onChange={handleChange}
-              options={[
-                ["A11", "Below 0 DM"],
-                ["A12", "0–200 DM"],
-                ["A13", "200+ DM"],
-                ["A14", "No checking account"],
-              ]}
-            />
-
-            <SelectField
-              label="Credit History"
-              name="credit_history"
-              value={form.credit_history}
-              onChange={handleChange}
-              options={[
-                ["A30", "No previous credit"],
-                ["A31", "All credits paid"],
-                ["A32", "Credits paid properly"],
-                ["A33", "Payment delays"],
-                ["A34", "Critical / other credits"],
-              ]}
-            />
-
-            <SelectField
-              label="Purpose"
-              name="purpose"
-              value={form.purpose}
-              onChange={handleChange}
-              options={[
-                ["A40", "New car"],
-                ["A41", "Used car"],
-                ["A42", "Furniture / equipment"],
-                ["A43", "Radio / television"],
-                ["A44", "Domestic appliances"],
-                ["A45", "Repairs"],
-                ["A46", "Education"],
-                ["A48", "Retraining"],
-                ["A49", "Business"],
-                ["A410", "Other"],
-              ]}
-            />
-
-            <SelectField
-              label="Savings"
-              name="savings_status"
-              value={form.savings_status}
-              onChange={handleChange}
-              options={[
-                ["A61", "Below 100 DM"],
-                ["A62", "100–500 DM"],
-                ["A63", "500–1000 DM"],
-                ["A64", "1000+ DM"],
-                ["A65", "Unknown / no savings"],
-              ]}
-            />
-
-            <SelectField
-              label="Employment"
-              name="employment_status"
-              value={form.employment_status}
-              onChange={handleChange}
-              options={[
-                ["A71", "Unemployed"],
-                ["A72", "Less than 1 year"],
-                ["A73", "1–4 years"],
-                ["A74", "4–7 years"],
-                ["A75", "7+ years"],
-              ]}
-            />
-
-            <SelectField
-              label="Housing"
-              name="housing"
-              value={form.housing}
-              onChange={handleChange}
-              options={[
-                ["A151", "Rent"],
-                ["A152", "Own"],
-                ["A153", "Free"],
-              ]}
-            />
-
-            <NumberField
-              label="Existing Credits"
-              name="existing_credits"
-              value={form.existing_credits}
-              onChange={handleChange}
-            />
-
-            <NumberField
-              label="Dependents"
-              name="dependents"
-              value={form.dependents}
-              onChange={handleChange}
-            />
+            <NumberField label="Credit Amount" name="credit_amount" value={form.credit_amount} onChange={handleChange}/>
+            <NumberField label="Duration (months)" name="duration_months" value={form.duration_months} onChange={handleChange}/>
+            <SelectField label="City" name="city" value={form.city} onChange={handleChange} options={[["Hyderabad","Hyderabad"],["Bengaluru","Bengaluru"],["Chennai","Chennai"],["Mumbai","Mumbai"],["Delhi","Delhi"],["Pune","Pune"]]}/>
+            <NumberField label="Age" name="age" value={form.age} min={18} onChange={handleChange}/>
+            <NumberField label="Installment Rate" name="installment_rate" value={form.installment_rate} onChange={handleChange}/>
+            <SelectField label="Checking Account" name="checking_status" value={form.checking_status} onChange={handleChange} options={[["A11","Below 0 DM"],["A12","0–200 DM"],["A13","200+ DM"],["A14","No checking account"]]}/>
+            <SelectField label="Credit History" name="credit_history" value={form.credit_history} onChange={handleChange} options={[["A30","No previous credit"],["A31","All credits paid"],["A32","Credits paid properly"],["A33","Payment delays"],["A34","Critical / other credits"]]}/>
+            <SelectField label="Purpose" name="purpose" value={form.purpose} onChange={handleChange} options={[["A40","New car"],["A41","Used car"],["A42","Furniture / equipment"],["A43","Radio / television"],["A44","Domestic appliances"],["A45","Repairs"],["A46","Education"],["A48","Retraining"],["A49","Business"],["A410","Other"]]}/>
+            <SelectField label="Savings" name="savings_status" value={form.savings_status} onChange={handleChange} options={[["A61","Below 100 DM"],["A62","100–500 DM"],["A63","500–1000 DM"],["A64","1000+ DM"],["A65","Unknown / no savings"]]}/>
+            <SelectField label="Employment" name="employment_status" value={form.employment_status} onChange={handleChange} options={[["A71","Unemployed"],["A72","Less than 1 year"],["A73","1–4 years"],["A74","4–7 years"],["A75","7+ years"]]}/>
+            <SelectField label="Housing" name="housing" value={form.housing} onChange={handleChange} options={[["A151","Rent"],["A152","Own"],["A153","Free"]]}/>
+            <NumberField label="Existing Credits" name="existing_credits" value={form.existing_credits} onChange={handleChange}/>
+            <NumberField label="Dependents" name="dependents" value={form.dependents} onChange={handleChange}/>
           </div>
-
-          <div className="advanced-note">
-            Additional model attributes are populated from the complete
-            applicant profile for this prototype.
-          </div>
-
-          <button
-            className="assess-button"
-            onClick={runAssessment}
-            disabled={loading}
-          >
-            {loading ? "Analyzing Applicant..." : "Run Risk Assessment"}
-          </button>
-
+          <div className="info-strip">ⓘ Occupation labels are demo context only; the model uses the editable credit attributes above.</div>
+          {inputsModified && <div className="stale-warning">↻ Applicant inputs modified <strong>Re-run assessment to refresh risk & SHAP</strong></div>}
+          <button className="primary-button assess-button" onClick={runAssessment} disabled={loading}>{loading ? "Running risk model..." : inputsModified ? "Re-run Risk Assessment  →" : "Run Risk Assessment  →"}</button>
           {error && <div className="error">{error}</div>}
         </section>
 
-        <section className="panel result-panel">
-          <div className="panel-heading">
-            <div>
-              <p className="eyebrow">DECISION SUPPORT</p>
-              <h2>Risk Assessment</h2>
+        <section className="panel risk-panel premium-panel">
+          <div className="panel-heading"><div><p className="eyebrow">02 · DECISION SUPPORT</p><h2>Risk Intelligence</h2><p>Model probability with local SHAP attribution.</p></div><span className="model-chip">RF · v{result?.model_version || '—'}</span></div>
+          {!result ? <div className="empty-state"><div className="radar-icon"><span></span></div><h3>Ready for assessment</h3><p>Run the applicant through the trained credit-risk model to reveal probability and contributing factors.</p></div> : <>
+            <div className={`risk-hero ${riskClass} ${inputsModified ? 'stale' : ''}`}>
+              <div className="risk-ring" style={{'--risk': `${result.risk_percentage * 3.6}deg`}}><div><span>BAD-RISK<br/>PROBABILITY</span><strong>{result.risk_percentage}%</strong><em>{result.risk_level} RISK</em></div></div>
+              <div className="risk-copy"><span className={`risk-badge ${riskClass}`}>● {result.risk_level} RISK BAND</span><h3>Model assessment</h3><p>Estimated probability from the trained Random Forest credit-risk pipeline.</p><div className="risk-scale"><i></i><span>0%</span><span>30%</span><span>60%</span><span>100%</span></div></div>
             </div>
-            <div className="step">02</div>
-          </div>
-
-          {!result ? (
-            <div className="empty-result">
-              <div className="empty-icon">◎</div>
-              <h3>Awaiting assessment</h3>
-              <p>
-                Complete the applicant profile and run the model to
-                generate a credit-risk assessment.
-              </p>
+            {inputsModified && <div className="stale-overlay-note">Displayed result reflects the previous inputs.</div>}
+            <div className="shap-block"><div className="section-minihead"><div><p className="eyebrow">EXPLAINABILITY · SHAP</p><h3>Key model drivers</h3></div><span>Contribution to prediction</span></div>
+              <div className="factor-list">{result.top_factors?.map((f)=><div className="factor" key={f.feature}><div className={`factor-icon ${f.impact>0?'risk-up-bg':'risk-down-bg'}`}>{f.impact>0?'↑':'↓'}</div><div className="factor-main"><strong>{f.feature.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase())}</strong><small>{f.impact>0?'Pushes toward higher modeled risk':'Pushes toward lower modeled risk'}</small></div><span className={f.impact>0?'risk-up':'risk-down'}>{f.direction}</span></div>)}</div>
+              <p className="micro-note">SHAP describes model influence, not causation. The output is decision support and not an automated approval or denial.</p>
             </div>
-          ) : (
-            <div className="result-content">
-              <p className="result-label">ESTIMATED BAD-RISK PROBABILITY</p>
-
-              <div className={`score ${riskClass}`}>
-                {result.risk_percentage}%
-              </div>
-
-              <div className={`risk-badge ${riskClass}`}>
-                {result.risk_level} RISK
-              </div>
-
-              <div className="meter">
-                <div
-                  className={`meter-fill ${riskClass}`}
-                  style={{ width: `${result.risk_percentage}%` }}
-                />
-              </div>
-
-              <div className="range-labels">
-                <span>Lower risk</span>
-                <span>Higher risk</span>
-              </div>
-
-              <div className="summary-card">
-                <div>
-                  <span>Model</span>
-                  <strong>Credit Risk v{result.model_version}</strong>
-                </div>
-
-                <div>
-                  <span>Assessment</span>
-                  <strong>Decision Support</strong>
-                </div>
-
-                <div>
-                  <span>Probability</span>
-                  <strong>{result.risk_probability}</strong>
-                </div>
-              </div>
-
-              <div className="explanation-placeholder">
-                <p className="eyebrow">EXPLAINABILITY · SHAP</p>
-                <h3>Key contributing factors</h3>
-
-                <div className="factor-list">
-                  {result.top_factors?.map((factor) => (
-                    <div className="factor" key={factor.feature}>
-                      <div className="factor-info">
-                        <span
-                          className={
-                            factor.impact > 0
-                              ? "factor-arrow risk-up"
-                              : "factor-arrow risk-down"
-                          }
-                        >
-                          {factor.impact > 0 ? "↑" : "↓"}
-                        </span>
-
-                        <span className="factor-name">
-                          {factor.feature
-                            .replaceAll("_", " ")
-                            .replace(/\b\w/g, (c) => c.toUpperCase())}
-                        </span>
-                      </div>
-
-                      <span
-                        className={
-                          factor.impact > 0
-                            ? "factor-direction risk-up"
-                            : "factor-direction risk-down"
-                        }
-                      >
-                        {factor.direction}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <p className="shap-note">
-                  SHAP values indicate how each feature influenced this model
-                  prediction and do not imply causation.
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="disclaimer">
-            Prototype decision-support system. The model output is not
-            an automated credit approval or denial.
-          </div>
+          </>}
         </section>
       </main>
-      <section className="behavior-section">
-        <div className="behavior-header">
-          <div>
-            <p className="eyebrow">ALTERNATIVE DATA INTELLIGENCE</p>
-            <h2>Transaction Behavior Analysis</h2>
-            <p className="behavior-description">
-              Supplement the traditional credit model with behavioral signals
-              derived from transaction history.
-            </p>
-          </div>
 
-          <span className="synthetic-badge">
-            SYNTHETIC / DEMO DATA
-          </span>
-        </div>
-
-        <div className="behavior-grid">
-          <div className="upload-card">
-            <h3>Transaction Statement</h3>
-
-            <p>
-              Upload a synthetic CSV containing transaction date,
-              description, amount and type.
-            </p>
-
-            <label className="file-upload">
-              <span>
-                {transactionFile
-                  ? transactionFile.name
-                  : "Choose transaction CSV"}
-              </span>
-
-              <input
-                type="file"
-                accept=".csv"
-                onChange={(event) => {
-                  setTransactionFile(event.target.files[0]);
-                  setBehaviorResult(null);
-                  setBehaviorError("");
-                }}
-              />
-            </label>
-
-            <button
-              className="analyze-button"
-              onClick={analyzeTransactions}
-              disabled={behaviorLoading}
-            >
-              {behaviorLoading
-                ? "Analyzing Transactions..."
-                : "Analyze Transactions"}
-            </button>
-
-            {behaviorError && (
-              <div className="error">{behaviorError}</div>
-            )}
-          </div>
-
-          <div className="behavior-results">
-            {!behaviorResult ? (
-              <div className="behavior-empty">
-                <div className="empty-icon">◎</div>
-                <h3>Awaiting transaction data</h3>
-                <p>
-                  Behavioral indicators will appear after the
-                  synthetic transaction statement is analyzed.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="analysis-meta">
-                  <strong>Analysis complete</strong>
-                  <span>
-                    {behaviorResult.months_analyzed} months ·{" "}
-                    {behaviorResult.total_transactions} transactions
-                  </span>
-                </div>
-
-                <div className="metric">
-                  <div>
-                    <span>Income Stability</span>
-                    <strong>
-                      {behaviorResult.income_stability}%
-                    </strong>
-                  </div>
-
-                  <div className="metric-bar">
-                    <div
-                      style={{
-                        width: `${behaviorResult.income_stability}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="metric">
-                  <div>
-                    <span>Cash-flow Consistency</span>
-                    <strong>
-                      {behaviorResult.cashflow_consistency}%
-                    </strong>
-                  </div>
-
-                  <div className="metric-bar">
-                    <div
-                      style={{
-                        width: `${behaviorResult.cashflow_consistency}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="metric">
-                  <div>
-                    <span>Average Savings Rate</span>
-                    <strong>
-                      {behaviorResult.average_savings_rate}%
-                    </strong>
-                  </div>
-
-                  <div className="metric-bar">
-                    <div
-                      style={{
-                        width: `${Math.max(
-                          0,
-                          behaviorResult.average_savings_rate
-                        )}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="volatility-card">
-                  <span>Spending Volatility</span>
-
-                  <strong>
-                    {behaviorResult.spending_volatility}
-                  </strong>
-
-                  <small>
-                    Variability score:{" "}
-                    {behaviorResult.spending_volatility_score}
-                  </small>
-                </div>
-
-                <p className="behavior-note">
-                  Behavioral indicators supplement the model assessment
-                  and are not incorporated into the trained credit-risk
-                  probability.
-                </p>
-                <button
-                  className="analyze-button"
-                  onClick={analyzeAffordability}
-                  disabled={affordabilityLoading}
-                >
-                  {affordabilityLoading
-                    ? "Calculating Repayment Capacity..."
-                    : "Calculate Repayment Capacity"}
-                </button>
-
-                {affordabilityError && (
-                  <div className="error">
-                    {affordabilityError}
-                  </div>
-                )}
-                {affordabilityResult && (
-                  <div className="affordability-card">
-                    <p className="eyebrow">REPAYMENT CAPACITY</p>
-                    <h3>Indicative Affordability Analysis</h3>
-
-                    <div className="summary-card">
-                      <div>
-                        <span>Stable Monthly Income</span>
-                        <strong>
-                          ₹{affordabilityResult.stable_monthly_income.toLocaleString()}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>Observed Monthly Expenses</span>
-                        <strong>
-                          ₹{affordabilityResult.observed_monthly_expenses.toLocaleString()}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>City Living-Cost Reference</span>
-                        <strong>
-                          ₹{affordabilityResult.city_living_cost_reference.toLocaleString()}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>Living Expense Used</span>
-                        <strong>
-                          ₹{affordabilityResult.living_expense_used.toLocaleString()}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>Repayment Surplus</span>
-                        <strong>
-                          ₹{affordabilityResult.repayment_surplus.toLocaleString()}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>Safety Buffer</span>
-                        <strong>
-                          ₹{affordabilityResult.safety_buffer.toLocaleString()}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <div className="summary-card">
-                      <div>
-                        <span>Affordable EMI</span>
-                        <strong>
-                          ₹{affordabilityResult.affordable_emi.toLocaleString()}
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>Estimated APR</span>
-                        <strong>
-                          {affordabilityResult.estimated_apr}%
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>Duration</span>
-                        <strong>
-                          {affordabilityResult.duration_months} months
-                        </strong>
-                      </div>
-
-                      <div>
-                        <span>Indicative Loan Capacity</span>
-                        <strong>
-                          ₹{affordabilityResult.indicative_loan_capacity.toLocaleString()}
-                        </strong>
-                      </div>
-                    </div>
-
-                    <p className="behavior-note">
-                      City living-cost references, repayment safety buffer,
-                      APR and loan capacity are illustrative prototype assumptions.
-                      This analysis is decision support only and is not a lending
-                      offer, approval or actual lender pricing.
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+      <section className="full-section intelligence-section">
+        <div className="section-header"><div><p className="eyebrow">03 · ALTERNATIVE DATA INTELLIGENCE</p><h2>Transaction Behavior</h2><p>Supplementary signals derived from synthetic transaction history.</p></div><span className="synthetic-badge">SYNTHETIC · DEMO DATA</span></div>
+        <div className="split-layout"><div className="upload-card premium-upload"><div className="upload-icon">⇧</div><h3>Transaction Statement</h3><p>CSV with date, description, amount and transaction type.</p><label className="file-upload"><span>{transactionFile ? transactionFile.name : "Drop or choose transaction CSV"}</span><small>CSV · validated before analysis</small><input type="file" accept=".csv" onChange={(e)=>{setTransactionFile(e.target.files[0]);setBehaviorResult(null);setBehaviorError("");}}/></label><button className="secondary-button" onClick={analyzeTransactions} disabled={behaviorLoading}>{behaviorLoading?"Analyzing cash flows...":"Analyze Transactions  →"}</button>{behaviorError&&<div className="error">{behaviorError}</div>}</div>
+          <div className="behavior-results">{!behaviorResult?<div className="empty-inline"><span>⌁</span><div><h3>Behavioral signals awaiting data</h3><p>Upload the matching synthetic transaction history to activate alternative-data intelligence.</p></div></div>:<><div className="analysis-success"><span>✓</span><div><strong>Behavioral analysis complete</strong><small>{behaviorResult.months_analyzed} months · {behaviorResult.total_transactions} transactions</small></div></div><div className="metric-grid">
+            <MetricCard label="Income Stability" value={`${behaviorResult.income_stability}%`} pct={behaviorResult.income_stability}/><MetricCard label="Cash-flow Consistency" value={`${behaviorResult.cashflow_consistency}%`} pct={behaviorResult.cashflow_consistency}/><MetricCard label="Average Savings Rate" value={`${behaviorResult.average_savings_rate}%`} pct={Math.max(0,behaviorResult.average_savings_rate)}/><MetricCard label="Spending Volatility" value={behaviorResult.spending_volatility} sub={`Score ${behaviorResult.spending_volatility_score}`} pct={Math.max(0,100-behaviorResult.spending_volatility_score)}/>
+          </div><p className="micro-note">Behavioral indicators are supplementary and are not incorporated into the trained risk probability.</p></>}</div></div>
       </section>
-      <section className="behavior-section">
-        <div className="behavior-header">
-          <div>
-            <p className="eyebrow">GENERATIVE AI · GROUNDED RAG</p>
-                  <section className="behavior-section">
-                    <div className="behavior-header">
-                      <div>
-                        <p className="eyebrow">SUPPORTING EVIDENCE · RAG</p>
-                        <h2>Financial Document Analysis</h2>
 
-                        <p className="behavior-description">
-                          Upload a synthetic supporting financial PDF. The document is
-                          extracted, chunked, embedded and indexed for semantic retrieval.
-                        </p>
-                      </div>
-
-                      <span className="synthetic-badge">
-                        SYNTHETIC / DEMO DATA
-                      </span>
-                    </div>
-
-                    <div className="upload-card">
-                      <h3>Supporting Financial Document</h3>
-
-                      <p>
-                        Upload a text-based PDF containing synthetic employment,
-                        income, obligations, payment or cash-flow information.
-                      </p>
-
-                      <label className="file-upload">
-                        <span>
-                          {documentFile
-                            ? documentFile.name
-                            : "Choose supporting PDF"}
-                        </span>
-
-                        <input
-                          type="file"
-                          accept=".pdf,application/pdf"
-                          onChange={(event) => {
-                            setDocumentFile(event.target.files[0]);
-                            setDocumentResult(null);
-                            setDocumentError("");
-                            setAiExplanation("");
-                            setAiError("");
-                          }}
-                        />
-                      </label>
-
-                      <button
-                        className="analyze-button"
-                        onClick={indexDocument}
-                        disabled={documentLoading}
-                      >
-                        {documentLoading
-                          ? "Processing Document..."
-                          : "Process & Index Document"}
-                      </button>
-
-                      {documentError && (
-                        <div className="error">{documentError}</div>
-                      )}
-
-                      {documentResult && (
-                        <div className="analysis-meta">
-                          <strong>Document indexed successfully</strong>
-
-                          <span>
-                            {documentResult.page_count} pages ·{" "}
-                            {documentResult.character_count} characters ·{" "}
-                            {documentResult.chunks_stored} chunks indexed
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </section>
-            <h2>Credit Intelligence Explanation</h2>
-
-            <p className="behavior-description">
-              Generate a grounded explanation using the model assessment,
-              SHAP contributions, behavioral indicators and retrieved
-              supporting-document evidence.
-            </p>
-          </div>
-
-          <span className="synthetic-badge">
-            EXPLAINABILITY ONLY
-          </span>
-        </div>
-
-        <button
-          className="analyze-button"
-          onClick={generateAIExplanation}
-          disabled={
-                aiLoading ||
-                !result ||
-                !behaviorResult ||
-                !documentResult
-              }
-        >
-          {aiLoading
-            ? "Generating Explanation..."
-            : "Generate AI Explanation"}
-        </button>
-
-        {aiError && (
-          <div className="error">{aiError}</div>
-        )}
-
-        {aiExplanation && (
-          <div className="ai-explanation">
-            <ReactMarkdown>
-              {aiExplanation}
-            </ReactMarkdown>
-          </div>
-        )}
-
-        <p className="behavior-note">
-          Gemini explains the supplied model and synthetic evidence.
-          It does not calculate the risk probability or make a credit
-          approval or rejection decision.
-        </p>
+      <section className="full-section capacity-section">
+        <div className="section-header"><div><p className="eyebrow">04 · REPAYMENT CAPACITY</p><h2>Affordability Intelligence</h2><p>Illustrative capacity analysis using observed cash flow and city living-cost reference.</p></div><button className="secondary-button compact" onClick={analyzeAffordability} disabled={affordabilityLoading||!result||!behaviorResult}>{affordabilityLoading?"Calculating...": affordabilityResult ? "↻ Recalculate Capacity": "Calculate Capacity  →"}</button></div>
+        {affordabilityError&&<div className="error">{affordabilityError}</div>}
+        {!affordabilityResult?<div className="empty-inline centered"><span>₹</span><div><h3>Capacity model ready</h3><p>Complete risk and transaction analysis to calculate repayment capacity.</p></div></div>:<><div className="capacity-grid"><StatCard label="Stable Monthly Income" value={`₹${affordabilityResult.stable_monthly_income.toLocaleString()}`} /><StatCard label="Living Expense Used" value={`₹${affordabilityResult.living_expense_used.toLocaleString()}`} sub={`${form.city} reference considered`} /><StatCard label="Repayment Surplus" value={`₹${affordabilityResult.repayment_surplus.toLocaleString()}`} /><StatCard label="Safety Buffer" value={`₹${affordabilityResult.safety_buffer.toLocaleString()}`} /></div><div className="capacity-hero"><div><span>AFFORDABLE EMI</span><strong>₹{affordabilityResult.affordable_emi.toLocaleString()}</strong><small>Illustrative monthly capacity</small></div><i></i><div><span>INDICATIVE LOAN CAPACITY</span><strong>₹{affordabilityResult.indicative_loan_capacity.toLocaleString()}</strong><small>{affordabilityResult.duration_months} months · {affordabilityResult.estimated_apr}% prototype APR</small></div></div><p className="micro-note">City references, safety buffer, APR and capacity are prototype assumptions — not a lending offer, approval or actual lender pricing.</p></>}
       </section>
+
+      <section className="full-section evidence-section">
+        <div className="section-header"><div><p className="eyebrow">05 · SUPPORTING EVIDENCE · RAG</p><h2>Document Intelligence</h2><p>Turn supporting financial documents into retrievable, grounded evidence.</p></div><span className="synthetic-badge">SYNTHETIC · DEMO DATA</span></div>
+        <div className="document-layout"><div className="upload-card premium-upload"><div className="upload-icon">▤</div><h3>Supporting Financial Document</h3><p>Text-based PDF with synthetic income, obligations, payment or cash-flow evidence.</p><label className="file-upload"><span>{documentFile?documentFile.name:"Drop or choose supporting PDF"}</span><small>PDF · max 5 MB · validated</small><input type="file" accept=".pdf,application/pdf" onChange={(e)=>{setDocumentFile(e.target.files[0]);setDocumentResult(null);setDocumentError("");setAiExplanation("");setAiError("");}}/></label><button className="secondary-button" onClick={indexDocument} disabled={documentLoading}>{documentLoading?"Extracting & indexing...":"Process & Index Document  →"}</button>{documentError&&<div className="error">{documentError}</div>}</div>
+          <div className="pipeline-card"><div className="pipeline-title"><div><span>RAG PROCESSING PIPELINE</span><h3>{documentResult?"Document intelligence ready":"Awaiting document"}</h3></div><span className={documentResult?'ready-pill':'waiting-pill'}>{documentResult?'● READY':'○ WAITING'}</span></div><div className="pipeline-flow"><PipelineStep done={!!documentResult} icon="01" title="Extracted" meta={documentResult?`${documentResult.page_count} page${documentResult.page_count===1?'':'s'}`:'PDF text'}/><b>→</b><PipelineStep done={!!documentResult} icon="02" title="Chunked" meta={documentResult?`${documentResult.chunks_stored} chunks`:'500 chars'}/><b>→</b><PipelineStep done={!!documentResult} icon="03" title="Embedded" meta="384-D vectors"/><b>→</b><PipelineStep done={!!documentResult} icon="04" title="Indexed" meta="Postgres · pgvector"/></div>{documentResult&&<div className="document-success">✓ {documentResult.filename} · {documentResult.character_count.toLocaleString()} characters · ready for semantic retrieval</div>}</div></div>
+      </section>
+
+      <section className="full-section ai-section">
+        <div className="ai-glow"></div><div className="section-header ai-header"><div><p className="eyebrow light">06 · GENERATIVE AI · GROUNDED RAG</p><h2>Credit Intelligence Explanation</h2><p>One grounded narrative across model output, SHAP, behavioral signals and retrieved evidence.</p></div><span className="guardrail-badge">◆ GUARDRAILED · EXPLAINABILITY ONLY</span></div>
+        <div className="readiness-row"><ReadyItem ready={!!result} label="Risk assessment"/><ReadyItem ready={!!behaviorResult} label="Behavioral signals"/><ReadyItem ready={!!documentResult} label="Document evidence"/><ReadyItem ready={!!(result&&behaviorResult&&documentResult)} label="Ready for synthesis"/></div>
+        <button className="ai-button" onClick={generateAIExplanation} disabled={aiLoading||!result||!behaviorResult||!documentResult}>{aiLoading?<><span className="spinner"></span> Synthesizing grounded intelligence...</>:"✦ Generate Grounded Intelligence  →"}</button>
+        {aiLoading&&<div className="ai-loading"><div><span>✓</span> Risk assessment available</div><div><span>✓</span> Behavioral signals incorporated</div><div><span>✓</span> Supporting evidence retrieved</div><div className="active"><span>◉</span> Generating grounded explanation...</div></div>}
+        {aiError&&<div className="error dark-error">{aiError}</div>}
+        {aiExplanation&&<div className="ai-output"><div className="ai-output-head"><span>✦</span><div><small>GROUNDED AI EXPLANATION</small><strong>Evidence-backed decision support</strong></div><em>Generated</em></div><ReactMarkdown>{aiExplanation}</ReactMarkdown></div>}
+        <p className="ai-disclaimer">Gemini explains supplied model outputs and synthetic evidence only. It does not calculate risk probability, approve/reject credit, or determine lender pricing.</p>
+      </section>
+
+      <footer><div className="brand-lockup"><span className="brand-mark small">CI</span><strong>Credit Intelligence</strong></div><span>Prototype decision-support system · Explainability by design · Synthetic alternative data</span></footer>
     </div>
   );
 }
+
+const MetricCard=({label,value,pct,sub})=><div className="metric-card"><span>{label}</span><strong>{value}</strong>{sub&&<small>{sub}</small>}<div className="metric-track"><i style={{width:`${Math.min(100,Math.max(0,pct))}%`}}></i></div></div>;
+const StatCard=({label,value,sub})=><div className="stat-card"><span>{label}</span><strong>{value}</strong>{sub&&<small>{sub}</small>}</div>;
+const PipelineStep=({done,icon,title,meta})=><div className={`pipeline-step ${done?'done':''}`}><span>{done?'✓':icon}</span><strong>{title}</strong><small>{meta}</small></div>;
+const ReadyItem=({ready,label})=><div className={ready?'ready-item ready':'ready-item'}><span>{ready?'✓':'○'}</span>{label}</div>;
 
 export default App;
