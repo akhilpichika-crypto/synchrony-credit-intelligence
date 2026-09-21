@@ -1,5 +1,7 @@
+from typing import Any
+
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from backend.app.services.document_service import retrieve_relevant_chunks
 from backend.app.services.llm_service import generate_credit_explanation
@@ -7,46 +9,105 @@ from backend.app.services.llm_service import generate_credit_explanation
 
 router = APIRouter(
     prefix="/intelligence",
-    tags=["Credit Intelligence"]
+    tags=["Credit Intelligence"],
 )
 
 
+class ShapFactor(BaseModel):
+    feature: str
+    shap_value: float
+
+
 class ExplanationRequest(BaseModel):
-    risk_probability: float
+    risk_probability: float = Field(
+        ge=0.0,
+        le=1.0,
+    )
+
     risk_band: str
-    shap_factors: list
-    behavioral_data: dict
-    query: str = (
-        "What evidence describes the applicant's income stability, "
-        "financial obligations, payment behavior and cash flow?"
+
+    shap_factors: list[ShapFactor]
+
+    behavioral_data: dict[str, Any]
+
+    document_name: str = Field(
+        min_length=1,
+        max_length=255,
+    )
+
+    query: str = Field(
+        default=(
+            "What evidence describes the applicant's income stability, "
+            "financial obligations, payment behavior and cash flow?"
+        ),
+        min_length=1,
+        max_length=500,
     )
 
 
 @router.post("/explain")
 def generate_explanation(request: ExplanationRequest):
+
+    # Validate risk band explicitly
+    risk_band = request.risk_band.upper()
+
+    if risk_band not in {"LOW", "MEDIUM", "HIGH"}:
+        raise HTTPException(
+            status_code=400,
+            detail="Risk band must be LOW, MEDIUM or HIGH.",
+        )
+
     try:
         evidence = retrieve_relevant_chunks(
             query=request.query,
-            top_k=3
+            document_name=request.document_name,
+            top_k=3,
         )
+
+        if not evidence:
+            raise HTTPException(
+                status_code=404,
+                detail=(
+                    "No indexed evidence found for "
+                    "the selected document."
+                ),
+            )
 
         explanation = generate_credit_explanation(
             risk_probability=request.risk_probability,
-            risk_band=request.risk_band,
-            shap_factors=request.shap_factors,
+            risk_band=risk_band,
+            shap_factors=[
+                factor.model_dump()
+                for factor in request.shap_factors
+            ],
             behavioral_data=request.behavioral_data,
-            retrieved_evidence=evidence
+            retrieved_evidence=evidence,
         )
 
         return {
             "risk_probability": request.risk_probability,
-            "risk_band": request.risk_band,
+            "risk_band": risk_band,
+            "document_name": request.document_name,
             "retrieved_evidence": evidence,
-            "explanation": explanation
+            "explanation": explanation,
         }
 
+    except HTTPException:
+        # Preserve intentional 4xx errors.
+        raise
+
     except Exception as error:
+        # Log details only on the backend.
+        print(
+            "Credit intelligence explanation error:",
+            repr(error),
+        )
+
+        # Do NOT expose Gemini/database/internal errors to client.
         raise HTTPException(
             status_code=500,
-            detail=f"Unable to generate explanation: {str(error)}"
+            detail=(
+                "Unable to generate the credit intelligence "
+                "explanation at this time."
+            ),
         )

@@ -92,11 +92,18 @@ def index_document(document_name: str, text: str):
     finally:
         db.close()
 
-def retrieve_relevant_chunks(query: str, top_k: int = 3):
+def retrieve_relevant_chunks(
+    query: str,
+    document_name: str,
+    top_k: int = 3
+):
     """
     Retrieve the document chunks most semantically similar
-    to the user's query.
+    to the user's query, restricted to the selected document.
     """
+
+    if not document_name or not document_name.strip():
+        raise ValueError("Document name is required for retrieval")
 
     query_embedding = generate_embedding(query)
 
@@ -105,8 +112,13 @@ def retrieve_relevant_chunks(query: str, top_k: int = 3):
     try:
         results = (
             db.query(DocumentChunk)
+            .filter(
+                DocumentChunk.document_name == document_name
+            )
             .order_by(
-                DocumentChunk.embedding.cosine_distance(query_embedding)
+                DocumentChunk.embedding.cosine_distance(
+                    query_embedding
+                )
             )
             .limit(top_k)
             .all()
@@ -122,4 +134,4 @@ def retrieve_relevant_chunks(query: str, top_k: int = 3):
         ]
 
     finally:
-        db.close()        
+        db.close()

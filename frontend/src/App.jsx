@@ -5,6 +5,7 @@ import "./App.css";
 const initialForm = {
   checking_status: "A11",
   duration_months: 6,
+  city: "Hyderabad",
   credit_history: "A34",
   purpose: "A43",
   credit_amount: 1169,
@@ -23,6 +24,107 @@ const initialForm = {
   dependents: 1,
   telephone: "A192",
   foreign_worker: "A201",
+};
+const demoProfiles = {
+  custom: {
+    label: "Custom Applicant",
+    form: initialForm,
+  },
+
+  government_employee: {
+    label: "Government Employee",
+    form: {
+      ...initialForm,
+      checking_status: "A13",
+      duration_months: 12,
+      city: "Hyderabad",
+      credit_history: "A32",
+      credit_amount: 3000,
+      savings_status: "A64",
+      employment_status: "A75",
+      installment_rate: 2,
+      age: 42,
+      housing: "A152",
+      existing_credits: 1,
+      dependents: 2,
+    },
+  },
+
+  street_vendor: {
+    label: "Street Vendor",
+    form: {
+      ...initialForm,
+      checking_status: "A11",
+      duration_months: 24,
+      city: "Chennai",
+      credit_history: "A30",
+      credit_amount: 4500,
+      savings_status: "A61",
+      employment_status: "A73",
+      installment_rate: 4,
+      age: 34,
+      housing: "A151",
+      existing_credits: 1,
+      dependents: 2,
+    },
+  },
+
+  doctor_private_practice: {
+    label: "Doctor – Private Practice",
+    form: {
+      ...initialForm,
+      checking_status: "A13",
+      duration_months: 18,
+      city: "Bengaluru",
+      credit_history: "A32",
+      credit_amount: 8000,
+      savings_status: "A64",
+      employment_status: "A75",
+      installment_rate: 2,
+      age: 45,
+      housing: "A152",
+      existing_credits: 2,
+      dependents: 2,
+    },
+  },
+
+  delivery_worker: {
+    label: "Delivery Worker",
+    form: {
+      ...initialForm,
+      checking_status: "A12",
+      duration_months: 18,
+      city: "Pune",
+      credit_history: "A32",
+      credit_amount: 2500,
+      savings_status: "A62",
+      employment_status: "A73",
+      installment_rate: 3,
+      age: 27,
+      housing: "A151",
+      existing_credits: 1,
+      dependents: 1,
+    },
+  },
+
+  textile_worker: {
+    label: "Textile Shop Worker",
+    form: {
+      ...initialForm,
+      checking_status: "A12",
+      duration_months: 12,
+      city: "Hyderabad",
+      credit_history: "A32",
+      credit_amount: 2000,
+      savings_status: "A62",
+      employment_status: "A74",
+      installment_rate: 3,
+      age: 36,
+      housing: "A151",
+      existing_credits: 1,
+      dependents: 2,
+    },
+  },
 };
 
 const SelectField = ({ label, name, value, options, onChange }) => (
@@ -60,9 +162,17 @@ function App() {
   const [behaviorResult, setBehaviorResult] = useState(null);
   const [behaviorLoading, setBehaviorLoading] = useState(false);
   const [behaviorError, setBehaviorError] = useState("");
+  const [affordabilityResult, setAffordabilityResult] = useState(null);
+  const [affordabilityLoading, setAffordabilityLoading] = useState(false);
+  const [affordabilityError, setAffordabilityError] = useState("");
   const [aiExplanation, setAiExplanation] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
+  const [documentFile, setDocumentFile] = useState(null);
+  const [documentResult, setDocumentResult] = useState(null);
+  const [documentLoading, setDocumentLoading] = useState(false);
+  const [documentError, setDocumentError] = useState("");
+  const [selectedProfile, setSelectedProfile] = useState("custom");
 
   const handleChange = (event) => {
     const { name, value, type } = event.target;
@@ -73,20 +183,46 @@ function App() {
     }));
   };
 
+  const handleDemoProfileChange = (event) => {
+    const profileKey = event.target.value;
+
+    setSelectedProfile(profileKey);
+    setForm({ ...demoProfiles[profileKey].form });
+
+    // Clear old results when applicant changes
+    setResult(null);
+    setBehaviorResult(null);
+    setDocumentResult(null);
+    setAiExplanation("");
+
+    setError("");
+    setBehaviorError("");
+    setDocumentError("");
+    setAiError("");
+  };
+
   const runAssessment = async () => {
     setLoading(true);
     setError("");
+    setAiExplanation("");
+    setAiError("");
+
+    // City is used by the affordability engine,
+    // not by the trained credit-risk model.
+    const { city, ...predictionPayload } = form;
 
     try {
       const response = await axios.post(
         "http://127.0.0.1:8000/predict",
-        form
+        predictionPayload
       );
 
       setResult(response.data);
     } catch (err) {
       console.error(err);
-      setError("Unable to complete assessment. Check that the API is running.");
+      setError(
+        "Unable to complete assessment. Check that the API is running."
+      );
     } finally {
       setLoading(false);
     }
@@ -100,6 +236,8 @@ function App() {
 
     setBehaviorLoading(true);
     setBehaviorError("");
+    setAiExplanation("");
+    setAiError("");
 
     const formData = new FormData();
     formData.append("file", transactionFile);
@@ -122,6 +260,87 @@ function App() {
     }
   };
 
+  const analyzeAffordability = async () => {
+    if (!result) {
+      setAffordabilityError(
+        "Run the credit risk assessment first."
+      );
+      return;
+    }
+    if (!behaviorResult) {
+      setAffordabilityError(
+        "Analyze the transaction statement first."
+      );
+      return;
+    }
+
+    setAffordabilityLoading(true);
+    setAffordabilityError("");
+    setAffordabilityResult(null);
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/affordability/analyze",
+        {
+          stable_monthly_income:
+            behaviorResult.stable_monthly_income,
+
+          observed_monthly_expenses:
+            behaviorResult.observed_monthly_expenses,
+
+          city: form.city,
+
+          existing_monthly_obligations: 0,
+          risk_band: result.risk_level,
+          duration_months: form.duration_months,
+        }
+      );
+
+      setAffordabilityResult(response.data);
+    } catch (err) {
+      console.error(err);
+
+      setAffordabilityError(
+        err.response?.data?.detail ||
+          "Unable to calculate repayment capacity."
+      );
+    } finally {
+      setAffordabilityLoading(false);
+    }
+  };
+
+  const indexDocument = async () => {
+    if (!documentFile) {
+      setDocumentError("Please select a supporting PDF.");
+      return;
+    }
+
+    setDocumentLoading(true);
+    setDocumentError("");
+    setDocumentResult(null);
+
+    const formData = new FormData();
+    formData.append("file", documentFile);
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/documents/index",
+        formData
+      );
+
+      setDocumentResult(response.data);
+    } catch (err) {
+      console.error(err);
+
+      setDocumentError(
+        err.response?.data?.detail ||
+          "Unable to process supporting document."
+      );
+    } finally {
+      setDocumentLoading(false);
+    }
+  };
+
   const generateAIExplanation = async () => {
     if (!result) {
       setAiError("Run the credit risk assessment first.");
@@ -133,11 +352,20 @@ function App() {
       return;
     }
 
+    if (!documentResult) {
+      setAiError("Process the supporting financial document first.");
+      return;
+    }
+
     setAiLoading(true);
     setAiError("");
     setAiExplanation("");
 
     try {
+      console.log(
+        "SENDING DOCUMENT NAME:",
+        documentResult?.document_name
+      );
       const response = await axios.post(
         "http://127.0.0.1:8000/intelligence/explain",
         {
@@ -157,7 +385,7 @@ function App() {
               behaviorResult.spending_volatility_score,
             average_savings_rate: behaviorResult.average_savings_rate,
           },
-
+          document_name: documentResult.filename,
           query:
             "What evidence describes the applicant's income stability, financial obligations, payment behavior and cash flow?",
         }
@@ -165,10 +393,12 @@ function App() {
 
       setAiExplanation(response.data.explanation);
     } catch (err) {
-      console.error(err);
+      console.error("AI ERROR:", err);
+      console.error("STATUS:", err.response?.status);
+      console.error("RESPONSE:", err.response?.data);
 
       setAiError(
-        err.response?.data?.detail ||
+        JSON.stringify(err.response?.data?.detail) ||
           "Unable to generate AI explanation."
       );
     } finally {
@@ -207,6 +437,25 @@ function App() {
             </div>
             <div className="step">01</div>
           </div>
+          <div className="field">
+            <label>Demo Profile</label>
+
+            <select
+              value={selectedProfile}
+              onChange={handleDemoProfileChange}
+            >
+              {Object.entries(demoProfiles).map(([key, profile]) => (
+                <option key={key} value={key}>
+                  {profile.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <p className="advanced-note">
+            Selecting a demo profile loads synthetic applicant attributes.
+            Occupation itself is not used as a credit-risk feature.
+          </p>
 
           <div className="form-grid">
             <NumberField
@@ -221,6 +470,21 @@ function App() {
               name="duration_months"
               value={form.duration_months}
               onChange={handleChange}
+            />
+
+            <SelectField
+              label="City"
+              name="city"
+              value={form.city}
+              onChange={handleChange}
+              options={[
+                ["Hyderabad", "Hyderabad"],
+                ["Bengaluru", "Bengaluru"],
+                ["Chennai", "Chennai"],
+                ["Mumbai", "Mumbai"],
+                ["Delhi", "Delhi"],
+                ["Pune", "Pune"],
+              ]}
             />
 
             <NumberField
@@ -616,6 +880,108 @@ function App() {
                   and are not incorporated into the trained credit-risk
                   probability.
                 </p>
+                <button
+                  className="analyze-button"
+                  onClick={analyzeAffordability}
+                  disabled={affordabilityLoading}
+                >
+                  {affordabilityLoading
+                    ? "Calculating Repayment Capacity..."
+                    : "Calculate Repayment Capacity"}
+                </button>
+
+                {affordabilityError && (
+                  <div className="error">
+                    {affordabilityError}
+                  </div>
+                )}
+                {affordabilityResult && (
+                  <div className="affordability-card">
+                    <p className="eyebrow">REPAYMENT CAPACITY</p>
+                    <h3>Indicative Affordability Analysis</h3>
+
+                    <div className="summary-card">
+                      <div>
+                        <span>Stable Monthly Income</span>
+                        <strong>
+                          ₹{affordabilityResult.stable_monthly_income.toLocaleString()}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Observed Monthly Expenses</span>
+                        <strong>
+                          ₹{affordabilityResult.observed_monthly_expenses.toLocaleString()}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>City Living-Cost Reference</span>
+                        <strong>
+                          ₹{affordabilityResult.city_living_cost_reference.toLocaleString()}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Living Expense Used</span>
+                        <strong>
+                          ₹{affordabilityResult.living_expense_used.toLocaleString()}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Repayment Surplus</span>
+                        <strong>
+                          ₹{affordabilityResult.repayment_surplus.toLocaleString()}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Safety Buffer</span>
+                        <strong>
+                          ₹{affordabilityResult.safety_buffer.toLocaleString()}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="summary-card">
+                      <div>
+                        <span>Affordable EMI</span>
+                        <strong>
+                          ₹{affordabilityResult.affordable_emi.toLocaleString()}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Estimated APR</span>
+                        <strong>
+                          {affordabilityResult.estimated_apr}%
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Duration</span>
+                        <strong>
+                          {affordabilityResult.duration_months} months
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>Indicative Loan Capacity</span>
+                        <strong>
+                          ₹{affordabilityResult.indicative_loan_capacity.toLocaleString()}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <p className="behavior-note">
+                      City living-cost references, repayment safety buffer,
+                      APR and loan capacity are illustrative prototype assumptions.
+                      This analysis is decision support only and is not a lending
+                      offer, approval or actual lender pricing.
+                    </p>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -625,6 +991,78 @@ function App() {
         <div className="behavior-header">
           <div>
             <p className="eyebrow">GENERATIVE AI · GROUNDED RAG</p>
+                  <section className="behavior-section">
+                    <div className="behavior-header">
+                      <div>
+                        <p className="eyebrow">SUPPORTING EVIDENCE · RAG</p>
+                        <h2>Financial Document Analysis</h2>
+
+                        <p className="behavior-description">
+                          Upload a synthetic supporting financial PDF. The document is
+                          extracted, chunked, embedded and indexed for semantic retrieval.
+                        </p>
+                      </div>
+
+                      <span className="synthetic-badge">
+                        SYNTHETIC / DEMO DATA
+                      </span>
+                    </div>
+
+                    <div className="upload-card">
+                      <h3>Supporting Financial Document</h3>
+
+                      <p>
+                        Upload a text-based PDF containing synthetic employment,
+                        income, obligations, payment or cash-flow information.
+                      </p>
+
+                      <label className="file-upload">
+                        <span>
+                          {documentFile
+                            ? documentFile.name
+                            : "Choose supporting PDF"}
+                        </span>
+
+                        <input
+                          type="file"
+                          accept=".pdf,application/pdf"
+                          onChange={(event) => {
+                            setDocumentFile(event.target.files[0]);
+                            setDocumentResult(null);
+                            setDocumentError("");
+                            setAiExplanation("");
+                            setAiError("");
+                          }}
+                        />
+                      </label>
+
+                      <button
+                        className="analyze-button"
+                        onClick={indexDocument}
+                        disabled={documentLoading}
+                      >
+                        {documentLoading
+                          ? "Processing Document..."
+                          : "Process & Index Document"}
+                      </button>
+
+                      {documentError && (
+                        <div className="error">{documentError}</div>
+                      )}
+
+                      {documentResult && (
+                        <div className="analysis-meta">
+                          <strong>Document indexed successfully</strong>
+
+                          <span>
+                            {documentResult.page_count} pages ·{" "}
+                            {documentResult.character_count} characters ·{" "}
+                            {documentResult.chunks_stored} chunks indexed
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </section>
             <h2>Credit Intelligence Explanation</h2>
 
             <p className="behavior-description">
@@ -642,7 +1080,12 @@ function App() {
         <button
           className="analyze-button"
           onClick={generateAIExplanation}
-          disabled={aiLoading || !result || !behaviorResult}
+          disabled={
+                aiLoading ||
+                !result ||
+                !behaviorResult ||
+                !documentResult
+              }
         >
           {aiLoading
             ? "Generating Explanation..."

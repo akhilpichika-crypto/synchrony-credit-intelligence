@@ -4,9 +4,9 @@ services:
     container_name: credit-intelligence-db
 
     environment:
-      POSTGRES_DB: credit_intelligence
-      POSTGRES_USER: credit_user
-      POSTGRES_PASSWORD: credit_password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
     ports:
       - "5433:5432"

@@ -10,23 +10,64 @@ router = APIRouter(
 
 
 @router.post("/analyze")
-async def analyze_behavior(file: UploadFile = File(...)):
+async def analyze_transaction_file(
+    file: UploadFile = File(...)
+):
+    # 1. Validate filename
+    if not file.filename:
+        raise HTTPException(
+            status_code=400,
+            detail="A CSV file is required."
+        )
 
+    # 2. Validate extension
     if not file.filename.lower().endswith(".csv"):
         raise HTTPException(
             status_code=400,
-            detail="Only CSV transaction files are supported"
+            detail="Only CSV transaction files are supported."
+        )
+
+    # 3. Validate MIME type
+    allowed_types = {
+        "text/csv",
+        "application/csv",
+        "application/vnd.ms-excel",
+    }
+
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid CSV file type."
+        )
+
+    # 4. Read file
+    file_bytes = await file.read()
+
+    # 5. Validate size
+    if len(file_bytes) == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded CSV is empty."
+        )
+
+    if len(file_bytes) > MAX_CSV_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="CSV file exceeds the 2 MB size limit."
         )
 
     try:
-        contents = await file.read()
-
-        result = analyze_transactions(contents)
-
-        return result
+        return analyze_transactions(file_bytes)
 
     except ValueError as error:
         raise HTTPException(
             status_code=400,
             detail=str(error)
+        )
+
+    except Exception:
+        # Don't expose internal exception details to the client.
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to process transaction file."
         )

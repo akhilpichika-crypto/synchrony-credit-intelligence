@@ -102,7 +102,21 @@ def analyze_transactions(file_bytes: bytes):
 
     # Keep presentation range sensible.
     average_savings_rate = max(-100, min(100, average_savings_rate))
+    # ---------- Affordability inputs ----------
 
+    # Median monthly income is used as a conservative estimate of
+    # sustainable/stable income and reduces sensitivity to unusually
+    # high or low individual months.
+    stable_monthly_income = float(income.median())
+
+    # Typical observed monthly debit expenditure.
+    observed_monthly_expenses = float(expenses.median())
+
+    # Net monthly cash flow before any city-level adjustment.
+    monthly_net_cashflow = income - expenses
+    median_monthly_net_cashflow = float(
+        monthly_net_cashflow.median()
+    )
     return {
         "data_source": "synthetic_transaction_statement",
         "months_analyzed": len(months),
@@ -115,5 +129,16 @@ def analyze_transactions(file_bytes: bytes):
         ),
         "average_savings_rate": round(
             float(average_savings_rate), 2
+        ),
+        "stable_monthly_income": round(
+            stable_monthly_income, 2
+        ),
+
+        "observed_monthly_expenses": round(
+            observed_monthly_expenses, 2
+        ),
+
+        "median_monthly_net_cashflow": round(
+            median_monthly_net_cashflow, 2
         ),
     }

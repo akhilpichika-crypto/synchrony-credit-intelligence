@@ -1,0 +1,83 @@
+date,description,amount,type
+2026-01-02,Platform payout,3924,credit
+2026-01-03,Rent,3147,debit
+2026-01-04,Delivery incentive,6037,credit
+2026-01-06,Weekly earnings,4830,credit
+2026-01-06,Fuel,4842,debit
+2026-01-08,Platform payout,3622,credit
+2026-01-09,Food,3873,debit
+2026-01-10,Delivery incentive,5735,credit
+2026-01-12,Weekly earnings,4528,credit
+2026-01-12,Vehicle maintenance,2905,debit
+2026-01-14,Platform payout,3324,credit
+2026-01-15,Mobile recharge,4600,debit
+2026-01-18,Rent,3633,debit
+2026-02-02,Platform payout,3831,credit
+2026-02-03,Rent,3352,debit
+2026-02-04,Delivery incentive,5894,credit
+2026-02-06,Weekly earnings,4715,credit
+2026-02-06,Fuel,5157,debit
+2026-02-08,Platform payout,3536,credit
+2026-02-09,Food,4126,debit
+2026-02-10,Delivery incentive,5600,credit
+2026-02-12,Weekly earnings,4424,credit
+2026-02-12,Vehicle maintenance,3094,debit
+2026-02-15,Mobile recharge,4900,debit
+2026-02-18,Rent,3871,debit
+2026-03-02,Platform payout,3669,credit
+2026-03-03,Rent,3188,debit
+2026-03-04,Delivery incentive,5645,credit
+2026-03-06,Fuel,4905,debit
+2026-03-06,Weekly earnings,4516,credit
+2026-03-08,Platform payout,3387,credit
+2026-03-09,Food,3924,debit
+2026-03-10,Delivery incentive,5362,credit
+2026-03-12,Weekly earnings,4233,credit
+2026-03-12,Vehicle maintenance,2943,debit
+2026-03-14,Platform payout,3104,credit
+2026-03-15,Mobile recharge,4660,debit
+2026-03-16,Delivery incentive,5084,credit
+2026-03-18,Rent,3679,debit
+2026-03-21,Fuel,2701,debit
+2026-04-02,Platform payout,3679,credit
+2026-04-03,Rent,3311,debit
+2026-04-04,Delivery incentive,5660,credit
+2026-04-06,Weekly earnings,4528,credit
+2026-04-06,Fuel,5094,debit
+2026-04-08,Platform payout,3396,credit
+2026-04-09,Food,4075,debit
+2026-04-10,Delivery incentive,5377,credit
+2026-04-12,Weekly earnings,4245,credit
+2026-04-12,Vehicle maintenance,3056,debit
+2026-04-14,Platform payout,3115,credit
+2026-04-15,Mobile recharge,4839,debit
+2026-04-18,Rent,3820,debit
+2026-04-21,Fuel,2805,debit
+2026-05-02,Platform payout,3485,credit
+2026-05-03,Rent,3352,debit
+2026-05-04,Delivery incentive,5362,credit
+2026-05-06,Weekly earnings,4289,credit
+2026-05-06,Fuel,5157,debit
+2026-05-08,Platform payout,3217,credit
+2026-05-09,Food,4126,debit
+2026-05-10,Delivery incentive,5094,credit
+2026-05-12,Weekly earnings,4021,credit
+2026-05-12,Vehicle maintenance,3094,debit
+2026-05-14,Platform payout,2949,credit
+2026-05-15,Mobile recharge,4900,debit
+2026-05-16,Delivery incentive,4826,credit
+2026-05-18,Rent,3871,debit
+2026-05-18,Weekly earnings,3757,credit
+2026-06-02,Platform payout,3557,credit
+2026-06-03,Rent,3372,debit
+2026-06-04,Delivery incentive,5473,credit
+2026-06-06,Weekly earnings,4378,credit
+2026-06-06,Fuel,5188,debit
+2026-06-08,Platform payout,3284,credit
+2026-06-09,Food,4150,debit
+2026-06-10,Delivery incentive,5200,credit
+2026-06-12,Weekly earnings,4108,credit
+2026-06-12,Vehicle maintenance,3113,debit
+2026-06-15,Mobile recharge,4929,debit
+2026-06-18,Rent,3891,debit
+2026-06-21,Fuel,2857,debit

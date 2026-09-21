@@ -8,6 +8,9 @@ from backend.app.routers.documents import router as documents_router
 from backend.app.database import Base, engine
 from backend.app.models.document_chunk import DocumentChunk
 from backend.app.routers.intelligence import router as intelligence_router
+from backend.app.routers.affordability import (
+    router as affordability_router,
+)
 
 app = FastAPI(
     title="Next-Gen Credit Intelligence API",
@@ -49,3 +52,4 @@ app.include_router(create_prediction_router(model))
 app.include_router(behavioral_router)
 app.include_router(documents_router)
 app.include_router(intelligence_router)
+app.include_router(affordability_router)

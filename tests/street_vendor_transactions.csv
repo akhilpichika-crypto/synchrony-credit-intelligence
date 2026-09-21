@@ -1,0 +1,136 @@
+date,description,amount,type
+2026-01-02,Customer sale,2191,credit
+2026-01-03,Inventory purchase,3188,debit
+2026-01-04,Cash deposit,3370,credit
+2026-01-06,UPI sale,2696,credit
+2026-01-06,Stall fee,4905,debit
+2026-01-08,Customer sale,2022,credit
+2026-01-09,Household,3924,debit
+2026-01-10,Cash deposit,3202,credit
+2026-01-12,UPI sale,2528,credit
+2026-01-12,Transport,2943,debit
+2026-01-14,Customer sale,1853,credit
+2026-01-15,Utilities,4660,debit
+2026-01-16,Cash deposit,3033,credit
+2026-01-18,Inventory purchase,3679,debit
+2026-01-18,UPI sale,2359,credit
+2026-01-20,Customer sale,1685,credit
+2026-01-21,Stall fee,2701,debit
+2026-01-22,Cash deposit,2865,credit
+2026-01-24,UPI sale,2196,credit
+2026-02-02,Customer sale,2350,credit
+2026-02-03,Cash deposit,2892,credit
+2026-02-03,Inventory purchase,2731,debit
+2026-02-04,Cash deposit,3615,credit
+2026-02-05,UPI sale,2169,credit
+2026-02-06,Stall fee,4202,debit
+2026-02-06,UPI sale,2892,credit
+2026-02-07,Customer sale,3434,credit
+2026-02-08,Customer sale,2169,credit
+2026-02-09,Household,3362,debit
+2026-02-09,Cash deposit,2718,credit
+2026-02-10,Cash deposit,3434,credit
+2026-02-12,Transport,2521,debit
+2026-02-12,UPI sale,2711,credit
+2026-02-14,Customer sale,1988,credit
+2026-02-15,Utilities,3992,debit
+2026-02-16,Cash deposit,3253,credit
+2026-02-18,UPI sale,2530,credit
+2026-02-18,Inventory purchase,3152,debit
+2026-02-20,Customer sale,1807,credit
+2026-02-21,Stall fee,2311,debit
+2026-02-22,Cash deposit,3073,credit
+2026-02-24,Household,3782,debit
+2026-02-24,UPI sale,2350,credit
+2026-02-26,Customer sale,3615,credit
+2026-02-27,Transport,2947,debit
+2026-03-02,Customer sale,2260,credit
+2026-03-03,Inventory purchase,3311,debit
+2026-03-04,Cash deposit,3478,credit
+2026-03-06,Stall fee,5094,debit
+2026-03-06,UPI sale,2782,credit
+2026-03-08,Customer sale,2086,credit
+2026-03-09,Household,4075,debit
+2026-03-10,Cash deposit,3304,credit
+2026-03-12,UPI sale,2608,credit
+2026-03-12,Transport,3056,debit
+2026-03-14,Customer sale,1913,credit
+2026-03-15,Utilities,4839,debit
+2026-03-16,Cash deposit,3130,credit
+2026-03-18,UPI sale,2439,credit
+2026-03-18,Inventory purchase,3820,debit
+2026-03-21,Stall fee,2805,debit
+2026-04-02,Customer sale,2415,credit
+2026-04-03,Inventory purchase,3074,debit
+2026-04-03,Cash deposit,2973,credit
+2026-04-04,Cash deposit,3716,credit
+2026-04-05,Utilities,2370,debit
+2026-04-05,UPI sale,2238,credit
+2026-04-06,UPI sale,2973,credit
+2026-04-06,Stall fee,4729,debit
+2026-04-08,Customer sale,2230,credit
+2026-04-09,Household,3783,debit
+2026-04-10,Cash deposit,3530,credit
+2026-04-12,UPI sale,2787,credit
+2026-04-12,Transport,2837,debit
+2026-04-14,Customer sale,2044,credit
+2026-04-15,Utilities,4493,debit
+2026-04-16,Cash deposit,3345,credit
+2026-04-18,UPI sale,2601,credit
+2026-04-18,Inventory purchase,3547,debit
+2026-04-20,Customer sale,1858,credit
+2026-04-21,Stall fee,2601,debit
+2026-04-22,Cash deposit,3159,credit
+2026-04-24,UPI sale,2415,credit
+2026-04-24,Household,4256,debit
+2026-04-26,Customer sale,3716,credit
+2026-04-27,Transport,3310,debit
+2026-05-02,Customer sale,2206,credit
+2026-05-03,Inventory purchase,3250,debit
+2026-05-04,Cash deposit,3393,credit
+2026-05-06,UPI sale,2715,credit
+2026-05-06,Stall fee,5000,debit
+2026-05-08,Customer sale,2036,credit
+2026-05-09,Household,4000,debit
+2026-05-10,Cash deposit,3224,credit
+2026-05-12,Transport,3000,debit
+2026-05-12,UPI sale,2545,credit
+2026-05-14,Customer sale,1866,credit
+2026-05-15,Utilities,4750,debit
+2026-05-16,Cash deposit,3054,credit
+2026-05-18,UPI sale,2375,credit
+2026-05-18,Inventory purchase,3750,debit
+2026-05-20,Customer sale,1696,credit
+2026-05-21,Stall fee,2750,debit
+2026-05-22,Cash deposit,2890,credit
+2026-05-24,Household,4500,debit
+2026-06-02,Customer sale,2339,credit
+2026-06-03,Inventory purchase,2915,debit
+2026-06-03,Cash deposit,2878,credit
+2026-06-04,Cash deposit,3598,credit
+2026-06-05,Utilities,2242,debit
+2026-06-05,UPI sale,2159,credit
+2026-06-06,Stall fee,4484,debit
+2026-06-06,UPI sale,2878,credit
+2026-06-07,Customer sale,3418,credit
+2026-06-08,Inventory purchase,3818,debit
+2026-06-08,Customer sale,2159,credit
+2026-06-09,Household,3587,debit
+2026-06-09,Cash deposit,2698,credit
+2026-06-10,Cash deposit,3418,credit
+2026-06-11,UPI sale,1979,credit
+2026-06-12,UPI sale,2698,credit
+2026-06-12,Transport,2690,debit
+2026-06-13,Customer sale,3248,credit
+2026-06-14,Customer sale,1979,credit
+2026-06-15,Utilities,4260,debit
+2026-06-16,Cash deposit,3238,credit
+2026-06-18,UPI sale,2519,credit
+2026-06-18,Inventory purchase,3363,debit
+2026-06-20,Customer sale,1799,credit
+2026-06-21,Stall fee,2466,debit
+2026-06-22,Cash deposit,3058,credit
+2026-06-24,UPI sale,2339,credit
+2026-06-24,Household,4036,debit
+2026-06-26,Customer sale,3598,credit
+2026-06-27,Transport,3139,debit

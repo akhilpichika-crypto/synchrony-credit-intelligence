@@ -1,0 +1,89 @@
+date,description,amount,type
+2026-01-02,Consultation receipt,15201,credit
+2026-01-03,Clinic rent,10947,debit
+2026-01-04,Procedure receipt,23387,credit
+2026-01-06,Patient payment,18709,credit
+2026-01-06,Staff payment,16842,debit
+2026-01-08,Consultation receipt,14032,credit
+2026-01-09,Medical supplies,13473,debit
+2026-01-10,Procedure receipt,22217,credit
+2026-01-12,Patient payment,17540,credit
+2026-01-12,Utilities,10105,debit
+2026-01-14,Consultation receipt,12862,credit
+2026-01-15,Household,16000,debit
+2026-01-16,Procedure receipt,21052,credit
+2026-01-18,Clinic rent,12633,debit
+2026-02-02,Consultation receipt,15052,credit
+2026-02-03,Clinic rent,11700,debit
+2026-02-04,Procedure receipt,23157,credit
+2026-02-06,Staff payment,18000,debit
+2026-02-06,Patient payment,18526,credit
+2026-02-08,Consultation receipt,13894,credit
+2026-02-09,Medical supplies,14400,debit
+2026-02-10,Procedure receipt,22000,credit
+2026-02-12,Patient payment,17371,credit
+2026-02-12,Utilities,10800,debit
+2026-02-15,Household,17100,debit
+2026-03-02,Consultation receipt,14493,credit
+2026-03-03,Clinic rent,11037,debit
+2026-03-04,Procedure receipt,22297,credit
+2026-03-06,Patient payment,17837,credit
+2026-03-06,Staff payment,16981,debit
+2026-03-08,Consultation receipt,13378,credit
+2026-03-09,Medical supplies,13584,debit
+2026-03-10,Procedure receipt,21182,credit
+2026-03-12,Utilities,10188,debit
+2026-03-12,Patient payment,16722,credit
+2026-03-14,Consultation receipt,12263,credit
+2026-03-15,Household,16132,debit
+2026-03-16,Procedure receipt,20067,credit
+2026-03-18,Patient payment,15608,credit
+2026-03-18,Clinic rent,12735,debit
+2026-03-20,Consultation receipt,11153,credit
+2026-03-21,Staff payment,9343,debit
+2026-04-02,Consultation receipt,15330,credit
+2026-04-03,Clinic rent,10536,debit
+2026-04-04,Procedure receipt,23584,credit
+2026-04-06,Patient payment,18867,credit
+2026-04-06,Staff payment,16210,debit
+2026-04-08,Consultation receipt,14150,credit
+2026-04-09,Medical supplies,12968,debit
+2026-04-10,Procedure receipt,22405,credit
+2026-04-12,Patient payment,17688,credit
+2026-04-12,Utilities,9726,debit
+2026-04-14,Consultation receipt,12976,credit
+2026-04-15,Household,15400,debit
+2026-04-18,Clinic rent,12160,debit
+2026-05-02,Consultation receipt,14181,credit
+2026-05-03,Clinic rent,10379,debit
+2026-05-04,Procedure receipt,21818,credit
+2026-05-06,Patient payment,17454,credit
+2026-05-06,Staff payment,15967,debit
+2026-05-08,Consultation receipt,13090,credit
+2026-05-09,Medical supplies,12774,debit
+2026-05-10,Procedure receipt,20727,credit
+2026-05-12,Patient payment,16363,credit
+2026-05-12,Utilities,9580,debit
+2026-05-14,Consultation receipt,12000,credit
+2026-05-15,Household,15169,debit
+2026-05-16,Procedure receipt,19636,credit
+2026-05-18,Patient payment,15272,credit
+2026-05-18,Clinic rent,11975,debit
+2026-05-20,Consultation receipt,10909,credit
+2026-05-21,Staff payment,8782,debit
+2026-05-22,Procedure receipt,18550,credit
+2026-05-24,Medical supplies,14374,debit
+2026-06-02,Consultation receipt,14153,credit
+2026-06-03,Clinic rent,11084,debit
+2026-06-04,Procedure receipt,21774,credit
+2026-06-06,Patient payment,17419,credit
+2026-06-06,Staff payment,17052,debit
+2026-06-08,Consultation receipt,13064,credit
+2026-06-09,Medical supplies,13642,debit
+2026-06-10,Procedure receipt,20685,credit
+2026-06-12,Patient payment,16330,credit
+2026-06-12,Utilities,10231,debit
+2026-06-14,Consultation receipt,11975,credit
+2026-06-15,Household,16200,debit
+2026-06-16,Procedure receipt,19600,credit
+2026-06-18,Clinic rent,12791,debit
